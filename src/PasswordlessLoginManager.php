@@ -19,7 +19,6 @@ class PasswordlessLoginManager
     /**
      * This assigns the login url to the given user.
      *
-     * @param User $user
      *
      * @return $this
      */
@@ -33,7 +32,6 @@ class PasswordlessLoginManager
     /**
      * Sets redirect URL for the Facade.
      *
-     * @param string $redirectUrl
      *
      * @return $this
      */

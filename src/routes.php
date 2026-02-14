@@ -1,7 +1,7 @@
 <?php
 
-use Grosv\LaravelPasswordlessLogin\LaravelPasswordlessLoginController;
 use Grosv\LaravelPasswordlessLogin\HandleAuthenticatedUsers;
+use Grosv\LaravelPasswordlessLogin\LaravelPasswordlessLoginController;
 use Illuminate\Support\Facades\Route;
 
 Route::get(

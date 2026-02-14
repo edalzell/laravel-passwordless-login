@@ -29,15 +29,15 @@ class HandleAuthenticatedUsers
      */
     private static function getHomeRoute(): string
     {
-        $provider_name = '\\' . app()->getNamespace() . 'Providers\\RouteServiceProvider';
+        $provider_name = '\\'.app()->getNamespace().'Providers\\RouteServiceProvider';
 
         if (class_exists($provider_name)) {
             if (method_exists($provider_name, 'home')) {
                 return call_user_func([$provider_name, 'home']);
             }
 
-            if (defined($provider_name . '::HOME')) {
-                return constant($provider_name . '::HOME');
+            if (defined($provider_name.'::HOME')) {
+                return constant($provider_name.'::HOME');
             }
         }
 
