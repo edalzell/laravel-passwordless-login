@@ -48,7 +48,10 @@ class PasswordlessLoginService
     public function getUser()
     {
         if (request()->has('user_type')) {
-            return Auth::guard(config('laravel-passwordless-login.user_guard'))
+
+            $guard = (new (UserClass::fromSlug(request('user_type'))))->guard_name ?? config('laravel-passwordless-login.user_guard');
+            
+            return Auth::guard($guard)
                 ->getProvider()
                 ->retrieveById(request('uid'));
         }
