@@ -3,6 +3,7 @@
 namespace Grosv\LaravelPasswordlessLogin\Traits;
 
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
+use Grosv\LaravelPasswordlessLogin\PasswordlessLogin as PasswordlessLoginFacade;
 
 /**
  * Logs in a user without a password.
@@ -67,7 +68,7 @@ trait PasswordlessLogin
     /**
      * This is a callback called on a successful login.
      *
-     * @param $request
+     * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
@@ -83,6 +84,6 @@ trait PasswordlessLogin
      */
     public function generateLoginUrl()
     {
-        return \Grosv\LaravelPasswordlessLogin\PasswordlessLogin::forUser($this)->generate();
+        return PasswordlessLoginFacade::forUser($this)->generate();
     }
 }
