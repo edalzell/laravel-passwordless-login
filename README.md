@@ -1,6 +1,8 @@
 # Laravel Passwordless Login
+
+[![build status](https://github.com/grosv/laravel-passwordless-login/actions/workflows/test.yml/badge.svg)](https://github.com/grosv/laravel-passwordless-login/actions/workflows/test.yml)
+
 ### A simple, safe magic login link generator for Laravel
-![build status](https://github.com/grosv/laravel-passwordless-login/actions/workflows/test.yml/badge.svg)
 
 This package provides a temporary signed route that logs in a user. What it does not provide is a way of actually sending the link to the route to the user. This is because I don't want to make any assumptions about how you communicate with your users.
 
