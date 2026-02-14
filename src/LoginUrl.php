@@ -35,7 +35,7 @@ class LoginUrl
 
         $this->passwordlessLoginService = new PasswordlessLoginService();
 
-        $this->route_expires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
+        $this->route_expires = now()->addMinutes(intval($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires')));
 
         $this->route_name = config('laravel-passwordless-login.login_route_name');
     }
