@@ -75,7 +75,7 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install composer dependencies
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Run tests
         run: vendor/bin/phpunit
