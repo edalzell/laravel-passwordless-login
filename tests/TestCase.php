@@ -17,7 +17,7 @@ abstract class TestCase extends BaseTestCase
         Config::set('laravel-passwordless-login.login_route_expires', 0.05);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -25,7 +25,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * add the package provider.
      *
-     * @param $app
      *
      * @return array
      */
