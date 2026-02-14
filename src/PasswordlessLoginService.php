@@ -3,7 +3,6 @@
 namespace Grosv\LaravelPasswordlessLogin;
 
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
-use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class PasswordlessLoginService
 {
     /**
-     * @var User
+     * @var \Illuminate\Contracts\Auth\Authenticatable
      */
     public $user;
 
@@ -25,7 +24,7 @@ class PasswordlessLoginService
     public function __construct()
     {
         $this->user = $this->getUser();
-        $this->cacheKey = \request('user_type').\request('expires');
+        $this->cacheKey = request('user_type').request('expires');
     }
 
     /**
@@ -59,15 +58,15 @@ class PasswordlessLoginService
      *
      * @param Request $request
      *
+     * @return void
+     *
      * @throws \Exception
      */
-    public function cacheRequest(Request $request)
+    public function cacheRequest(Request $request): void
     {
-        if ($this->usesTrait()) {
-            $routeExpiration = $this->user->login_route_expires_in;
-        } else {
-            $routeExpiration = config('laravel-passwordless-login.login_route_expires');
-        }
+        $routeExpiration = $this->usesTrait()
+            ? $this->user->login_route_expires_in
+            : config('laravel-passwordless-login.login_route_expires');
 
         cache()->remember($this->cacheKey, $routeExpiration * 60, function () use ($request) {
             return $request->url();
@@ -83,16 +82,10 @@ class PasswordlessLoginService
      */
     public function requestIsNew(): bool
     {
-        if ($this->usesTrait()) {
-            $loginOnce = $this->user->login_use_once;
-        } else {
-            $loginOnce = config('laravel-passwordless-login.login_use_once');
-        }
+        $loginOnce = $this->usesTrait()
+            ? $this->user->login_use_once
+            : config('laravel-passwordless-login.login_use_once');
 
-        if (!$loginOnce || !cache()->has($this->cacheKey)) {
-            return true;
-        } else {
-            return false;
-        }
+        return !$loginOnce || !cache()->has($this->cacheKey);
     }
 }
