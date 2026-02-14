@@ -6,10 +6,9 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
-        os: [ubuntu-latest]
         laravel: [11.*, 12.*]
         php: [8.2, 8.3, 8.4, 8.5]
         stability: [prefer-lowest, prefer-stable]
@@ -41,7 +40,7 @@ jobs:
         exclude:
           - php: 8.5
             laravel: 11.*
-    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }}
 
     services:
       mysql:
@@ -55,7 +54,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
