@@ -8,6 +8,8 @@ This package provides a temporary signed route that logs in a user. What it does
 ```shell script
 composer require grosv/laravel-passwordless-login
 ```
+### :film_strip: Video Tutorial 
+Video tutorial can be found [here](https://youtu.be/EIksYsX05Tg)
 
 ### Simple Usage
 ```php
