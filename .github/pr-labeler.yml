@@ -1,0 +1,4 @@
+chore: 'chore/*'
+feature: ['feature/*', 'feat/*']
+fix: 'fix/*'
+improvement: ['improvement/*', 'improve/*']
