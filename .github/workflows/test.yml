@@ -2,15 +2,46 @@ name: Test
 
 on:
   - push
+  - pull_request
 
 jobs:
   test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        operating-system: [ubuntu-latest]
-        php-version: ['7.4', '8.0', '8.1', '8.2']
-
-    name: php ${{ matrix.php-version }} on ${{ matrix.operating-system }}
+        os: [ubuntu-latest]
+        laravel: [11.*, 12.*]
+        php: [8.2, 8.3, 8.4, 8.5]
+        dependency-version: [prefer-lowest, prefer-stable]
+        include:
+          - php: 7.4
+            laravel: 6.*
+            stability: prefer-stable
+          - php: 8.0
+            laravel: 6.*
+            stability: prefer-stable
+          - php: 7.4
+            laravel: 7.*
+            stability: prefer-stable
+          - php: 8.0
+            laravel: 7.*
+            stability: prefer-stable
+          - php: 7.4
+            laravel: 8.*
+            stability: prefer-stable
+          - php: 8.0
+            laravel: 8.*
+            stability: prefer-stable
+          - php: 8.2
+            laravel: 9.*
+            stability: prefer-stable
+          - php: 8.3
+            laravel: 10.*
+            stability: prefer-stable
+        exclude:
+          - php: 8.5
+            laravel: 11.*
+    name: name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
     services:
       mysql:
@@ -22,16 +53,16 @@ jobs:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
-    runs-on: ${{ matrix.operating-system }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: ${{ matrix.php }}
           extensions: mbstring
           coverage: none
 
@@ -40,16 +71,14 @@ jobs:
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Setup composer cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Install composer dependencies
-        env:
-          COMPOSER_AUTH: ${{ secrets.COMPOSER_AUTH }}
-        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+        run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --no-dev
 
       - name: Run tests
         run: vendor/bin/phpunit
