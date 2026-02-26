@@ -8,6 +8,7 @@
   <php>
     <env name="APP_ENV" value="testing"/>
     <env name="APP_DEBUG" value="true"/>
+    <env name="LPL_LOGIN_ROUTE_EXPIRES" value="0.05"/>
   </php>
   <source>
     <include>
