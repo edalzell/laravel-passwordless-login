@@ -123,27 +123,26 @@ class SignedUrlTest extends TestCase
         $this->url = $generator->generate();
         $response = $this->followingRedirects()->get($this->url);
         $response->assertSuccessful();
-        // $response->assertSee($this->model_user->name);
+        $response->assertSee($this->model_user->name, false);
         $this->assertAuthenticatedAs($this->model_user);
     }
 
-    // #[Test]
-    // public function an_expired_request_will_not_log_user_in()
-    // {
-    //     sleep(config('laravel-passwordless-login.login_route_expires') + 1);
+    #[Test]
+    public function an_expired_request_will_not_log_user_in()
+    {
+        Carbon::setTestNow(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires') + 1));
+        // Make sure 401 is returned
+        $this->assertGuest();
+        $response = $this->get($this->url);
+        $response->assertStatus(401);
+        $this->assertGuest();
 
-    //     // Make sure 401 is returned
-    //     $this->assertGuest();
-    //     $response = $this->get($this->url);
-    //     $response->assertStatus(401);
-    //     $this->assertGuest();
-
-    //     // Make sure ExpiredSignatureException is thrown
-    //     $this->withoutExceptionHandling();
-    //     $this->expectException(ExpiredSignatureException::class);
-    //     $this->get($this->url);
-    //     $this->assertGuest();
-    // }
+        // Make sure ExpiredSignatureException is thrown
+        $this->withoutExceptionHandling();
+        $this->expectException(ExpiredSignatureException::class);
+        $this->get($this->url);
+        $this->assertGuest();
+    }
 
     #[Test]
     public function an_authenticated_user_is_redirected_correctly()
