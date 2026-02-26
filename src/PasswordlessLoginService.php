@@ -16,7 +16,7 @@ class PasswordlessLoginService
 {
     private string $cacheKey;
 
-    public Authenticatable $user;
+    public ?Authenticatable $user;
 
     public function __construct()
     {
