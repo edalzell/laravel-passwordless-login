@@ -11,14 +11,17 @@ class LoginUrl
      * @var User
      */
     private $user;
+
     /**
-     * @var string
+     * @var \Illuminate\Config\Repository
      */
     private $route_name;
+
     /**
      * @var \Carbon\Carbon
      */
     private $route_expires;
+
     /**
      * @var string
      */
@@ -44,9 +47,9 @@ class LoginUrl
             $this->route_name,
             $this->route_expires,
             [
-                'uid'           => $this->user->getAuthIdentifier(),
-                'redirect_to'   => $this->redirect_url,
-                'user_type'     => UserClass::toSlug(get_class($this->user)),
+                'uid' => $this->user->getAuthIdentifier(),
+                'redirect_to' => $this->redirect_url,
+                'user_type' => UserClass::toSlug(get_class($this->user)),
             ]
         );
     }

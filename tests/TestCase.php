@@ -8,16 +8,15 @@ use Orchestra\Testbench\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->loadLaravelMigrations();
         Config::set('laravel-passwordless-login.user_model', 'Grosv\LaravelPasswordlessLogin\Models\User');
         Config::set('laravel-passwordless-login.redirect_on_success', '/laravel_passwordless_login_redirect_test_route');
-        Config::set('laravel-passwordless-login.login_route_expires', 0.05);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         parent::tearDown();
     }
@@ -25,7 +24,6 @@ abstract class TestCase extends BaseTestCase
     /**
      * add the package provider.
      *
-     * @param $app
      *
      * @return array
      */
