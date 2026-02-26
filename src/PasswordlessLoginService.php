@@ -2,30 +2,26 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Exception;
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
-use Illuminate\Contracts\Auth\Authenticatable as User;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Psr\SimpleCache\InvalidArgumentException;
 
 /**
  * Service class to keep the controller clean.
  */
 class PasswordlessLoginService
 {
-    /**
-     * @var User
-     */
-    public $user;
+    private string $cacheKey;
 
-    /**
-     * @var string
-     */
-    private $cacheKey;
+    public ?Authenticatable $user;
 
     public function __construct()
     {
         $this->user = $this->getUser();
-        $this->cacheKey = \request('user_type').\request('expires');
+        $this->cacheKey = request('user_type').request('expires');
     }
 
     /**
@@ -38,33 +34,25 @@ class PasswordlessLoginService
         return in_array(PasswordlessLogin::class, $traits);
     }
 
-    /**
-     * Get the user from the request.
-     *
-     * @return mixed
-     */
-    public function getUser()
+    public function getUser(): ?Authenticatable
     {
-        if (request()->has('user_type')) {
-            return Auth::guard(config('laravel-passwordless-login.user_guard'))
-                ->getProvider()
-                ->retrieveById(request('uid'));
+        if (! request()->has('user_type')) {
+            return null;
         }
+
+        return Auth::guard(config('laravel-passwordless-login.user_guard'))
+            ->getProvider()
+            ->retrieveById(request('uid'));
     }
 
     /**
-     * Caches this request.
-     *
-     *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function cacheRequest(Request $request)
+    public function cacheRequest(Request $request): void
     {
-        if ($this->usesTrait()) {
-            $routeExpiration = $this->user->login_route_expires_in;
-        } else {
-            $routeExpiration = config('laravel-passwordless-login.login_route_expires');
-        }
+        $routeExpiration = $this->usesTrait()
+            ? $this->user->login_route_expires_in
+            : config('laravel-passwordless-login.login_route_expires');
 
         cache()->remember($this->cacheKey, $routeExpiration * 60, function () use ($request) {
             return $request->url();
@@ -72,22 +60,14 @@ class PasswordlessLoginService
     }
 
     /**
-     * Checks if this request has been made yet.
-     *
-     * @throws \Psr\SimpleCache\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function requestIsNew(): bool
     {
-        if ($this->usesTrait()) {
-            $loginOnce = $this->user->login_use_once;
-        } else {
-            $loginOnce = config('laravel-passwordless-login.login_use_once');
-        }
+        $loginOnce = $this->usesTrait()
+            ? $this->user->login_use_once
+            : config('laravel-passwordless-login.login_use_once');
 
-        if (! $loginOnce || ! cache()->has($this->cacheKey)) {
-            return true;
-        } else {
-            return false;
-        }
+        return ! $loginOnce || ! cache()->has($this->cacheKey);
     }
 }
