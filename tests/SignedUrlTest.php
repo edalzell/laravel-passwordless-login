@@ -123,7 +123,7 @@ class SignedUrlTest extends TestCase
         $this->url = $generator->generate();
         $response = $this->followingRedirects()->get($this->url);
         $response->assertSuccessful();
-        // $response->assertSee($this->model_user->name);
+        $response->assertSee($this->model_user->name, false);
         $this->assertAuthenticatedAs($this->model_user);
     }
 
