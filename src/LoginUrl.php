@@ -27,16 +27,9 @@ class LoginUrl
      */
     private $redirect_url;
 
-    /**
-     * @var PasswordlessLoginService
-     */
-    private $passwordlessLoginService;
-
     public function __construct(User $user)
     {
         $this->user = $user;
-
-        $this->passwordlessLoginService = new PasswordlessLoginService;
 
         $this->route_expires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
 
