@@ -14,7 +14,6 @@ abstract class TestCase extends BaseTestCase
         $this->loadLaravelMigrations();
         Config::set('laravel-passwordless-login.user_model', 'Grosv\LaravelPasswordlessLogin\Models\User');
         Config::set('laravel-passwordless-login.redirect_on_success', '/laravel_passwordless_login_redirect_test_route');
-        Config::set('laravel-passwordless-login.login_route_expires', 0.05);
     }
 
     protected function tearDown(): void
