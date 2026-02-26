@@ -1,0 +1,22 @@
+name: Release Drafter
+
+on:
+  pull_request:
+    types: [closed]
+permissions:
+  contents: write
+
+jobs:
+  update_release_draft:
+    if: github.event.pull_request.merged == true
+    permissions:
+      # write permission is required to create a github release
+      contents: write
+      # write permission is required for autolabeler
+      # otherwise, read permission is required at least
+      pull-requests: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: release-drafter/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

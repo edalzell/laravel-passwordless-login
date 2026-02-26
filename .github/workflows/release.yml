@@ -1,0 +1,76 @@
+name: Release
+
+on:
+  workflow_dispatch:
+jobs:
+  get_draft_release:
+    runs-on: ubuntu-latest
+    outputs:
+      release_body: ${{ steps.latest_draft_release.outputs.body }}
+      release_id: ${{ steps.latest_draft_release.outputs.id }}
+      release_tag: ${{ steps.latest_draft_release.outputs.tag_name }}
+      release_upload_url: ${{ steps.latest_draft_release.outputs.upload_url }}
+    steps:
+      - name: Get Draft Release
+        uses: cardinalby/git-get-release-action@v1
+        id: latest_draft_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          draft: true
+          latest: true
+
+  upload_assets:
+    needs: get_draft_release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        uses: php-actions/composer@v6
+        with:
+            php_version: "8.4"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Compile assets
+        run: npm run production
+
+      - name: Create zip
+        run: tar -czvf dist.tar.gz dist
+
+      - name: Upload zip to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.get_draft_release.outputs.release_upload_url }}
+          asset_path: ./dist.tar.gz
+          asset_name: dist.tar.gz
+          asset_content_type: application/tar+gz
+
+  release:
+    runs-on: ubuntu-latest
+    needs: get_draft_release
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Update Changelog
+        id: update_changelog
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ needs.get_draft_release.outputs.release_tag }}
+          release-notes: ${{ needs.get_draft_release.outputs.release_body }}
+      - name: Commit updated CHANGELOG
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: main
+          commit_message: Update CHANGELOG
+          file_pattern: CHANGELOG.md
+      - uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.get_draft_release.outputs.release_id }}

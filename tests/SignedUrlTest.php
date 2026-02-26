@@ -4,23 +4,28 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Faker\Factory as Faker;
-use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
+use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\Test;
 
 class SignedUrlTest extends TestCase
 {
     protected $user;
+
     private $url;
+
     private $route;
+
     private $expires;
+
     private $uid;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +50,7 @@ class SignedUrlTest extends TestCase
 
         $generator = new LoginUrl($this->user);
         $this->url = $generator->generate();
-        list($route, $uid) = explode('/', ltrim(parse_url($this->url)['path'], '/'));
+        [$route, $uid] = explode('/', ltrim(parse_url($this->url)['path'], '/'));
         $expires = explode('=', explode('&', explode('?', $this->url)[1])[0])[1];
 
         $this->route = $route;
@@ -53,7 +58,7 @@ class SignedUrlTest extends TestCase
         $this->uid = $uid;
     }
 
-    /** @test */
+    #[Test]
     public function can_create_default_signed_login_url()
     {
         $this->assertEquals(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires'))->timestamp, $this->expires);
@@ -61,7 +66,7 @@ class SignedUrlTest extends TestCase
         $this->assertEquals(config('laravel-passwordless-login.login_route_name'), $this->route);
     }
 
-    /** @test */
+    #[Test]
     public function a_signed_request_will_log_user_in_and_redirect()
     {
         $this->withoutExceptionHandling();
@@ -73,7 +78,7 @@ class SignedUrlTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function an_unsigned_request_will_not_log_user_in()
     {
         $unsigned = explode('?', $this->url)[0];
@@ -84,22 +89,22 @@ class SignedUrlTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function an_invalid_signature_request_will_not_log_user_in()
     {
         // Check 401 is returned
         $this->assertGuest();
-        $response = $this->get($this->url . 'tampered');
+        $response = $this->get($this->url.'tampered');
         $response->assertStatus(401);
         $this->assertGuest();
 
         // Check correct exception is thrown
         $this->withoutExceptionHandling();
         $this->expectException(InvalidSignatureException::class);
-        $this->get($this->url . 'tampered');
+        $this->get($this->url.'tampered');
     }
 
-    /** @test */
+    #[Test]
     public function allows_override_of_post_login_redirect()
     {
         $generator = new LoginUrl($this->user);
@@ -110,7 +115,7 @@ class SignedUrlTest extends TestCase
         $this->assertAuthenticatedAs($this->user);
     }
 
-    /** @test */
+    #[Test]
     public function allows_alternative_auth_model()
     {
         $generator = new LoginUrl($this->model_user);
@@ -118,15 +123,14 @@ class SignedUrlTest extends TestCase
         $this->url = $generator->generate();
         $response = $this->followingRedirects()->get($this->url);
         $response->assertSuccessful();
-        $response->assertSee($this->model_user->name);
+        $response->assertSee($this->model_user->name, false);
         $this->assertAuthenticatedAs($this->model_user);
     }
 
-    /** @test */
+    #[Test]
     public function an_expired_request_will_not_log_user_in()
     {
-        sleep(config('laravel-passwordless-login.login_route_expires') + 1);
-
+        Carbon::setTestNow(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires') + 1));
         // Make sure 401 is returned
         $this->assertGuest();
         $response = $this->get($this->url);
@@ -140,7 +144,7 @@ class SignedUrlTest extends TestCase
         $this->assertGuest();
     }
 
-    /** @test */
+    #[Test]
     public function an_authenticated_user_is_redirected_correctly()
     {
         $this->actingAs($this->user);
@@ -148,11 +152,11 @@ class SignedUrlTest extends TestCase
         $response->assertRedirect(config('laravel-passwordless-login.redirect_on_success'));
     }
 
-    /** @test */
+    #[Test]
     public function an_authenticated_user_with_redirect_on_url_is_redirected_correctly()
     {
         $this->actingAs($this->user);
-        $response = $this->get($this->url . '&redirect_to=/happy_path');
+        $response = $this->get($this->url.'&redirect_to=/happy_path');
         $response->assertRedirect('/happy_path');
     }
 }

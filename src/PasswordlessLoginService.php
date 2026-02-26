@@ -29,8 +29,6 @@ class PasswordlessLoginService
 
     /**
      * Checks if this use class uses the PasswordlessLogable trait.
-     *
-     * @return bool
      */
     public function usesTrait(): bool
     {
@@ -56,9 +54,7 @@ class PasswordlessLoginService
     /**
      * Caches this request.
      *
-     * @param Request $request
      *
-     * @return void
      *
      * @throws \Exception
      */
@@ -77,8 +73,6 @@ class PasswordlessLoginService
      * Checks if this request has been made yet.
      *
      * @throws \Psr\SimpleCache\InvalidArgumentException
-     *
-     * @return bool
      */
     public function requestIsNew(): bool
     {
@@ -86,6 +80,6 @@ class PasswordlessLoginService
             ? $this->user->login_use_once
             : config('laravel-passwordless-login.login_use_once');
 
-        return !$loginOnce || !cache()->has($this->cacheKey);
+        return ! $loginOnce || ! cache()->has($this->cacheKey);
     }
 }
