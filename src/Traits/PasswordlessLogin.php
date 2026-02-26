@@ -11,8 +11,6 @@ trait PasswordlessLogin
 {
     /**
      * Returns the guard set for this user.
-     *
-     * @return string
      */
     public function getGuardNameAttribute(): string
     {
@@ -21,8 +19,6 @@ trait PasswordlessLogin
 
     /**
      * Whether a user should be remembered on login.
-     *
-     * @return bool
      */
     public function getShouldRememberLoginAttribute(): bool
     {
@@ -31,8 +27,6 @@ trait PasswordlessLogin
 
     /**
      * Returns the number of minutes the route will expire in from the current time.
-     *
-     * @return int
      */
     public function getLoginRouteExpiresInAttribute(): int
     {
@@ -41,8 +35,6 @@ trait PasswordlessLogin
 
     /**
      * Returns the url to redirect to on successful login.
-     *
-     * @return string
      */
     public function getRedirectUrlAttribute(): string
     {
@@ -67,7 +59,6 @@ trait PasswordlessLogin
     /**
      * This is a callback called on a successful login.
      *
-     * @param $request
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
