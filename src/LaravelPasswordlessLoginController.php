@@ -4,10 +4,14 @@ namespace Grosv\LaravelPasswordlessLogin;
 
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
+use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
+use Psr\SimpleCache\InvalidArgumentException;
 
 class LaravelPasswordlessLoginController extends Controller
 {
@@ -34,9 +38,9 @@ class LaravelPasswordlessLoginController extends Controller
      * Handles login from the signed route.
      *
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return RedirectResponse|Redirector
      *
-     * @throws \Psr\SimpleCache\InvalidArgumentException|InvalidSignatureException|ExpiredSignatureException
+     * @throws InvalidArgumentException|InvalidSignatureException|ExpiredSignatureException
      */
     public function login(Request $request)
     {
@@ -69,7 +73,7 @@ class LaravelPasswordlessLoginController extends Controller
     /**
      * Redirect testing.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function redirectTestRoute()
     {
@@ -79,7 +83,7 @@ class LaravelPasswordlessLoginController extends Controller
     /**
      * Redirect override testing.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function overrideTestRoute()
     {
