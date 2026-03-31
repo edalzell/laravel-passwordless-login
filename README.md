@@ -80,7 +80,7 @@ LPL_USER_GUARD=web
 LPL_USE_ONCE=false
 LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 ```
-`LPL_USER_MODEL` is the the authenticatable model you are logging in (usually App\User)
+`LPL_USER_MODEL` is the the authenticatable model you are logging in (usually App\Models\User)
 
 `LPL_REMEMBER_LOGIN` is whether you want to remember the login (like the user checking Remember Me)
 
