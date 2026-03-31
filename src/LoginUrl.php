@@ -2,6 +2,8 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Carbon\Carbon;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Support\Facades\URL;
 
@@ -13,12 +15,12 @@ class LoginUrl
     private $user;
 
     /**
-     * @var \Illuminate\Config\Repository
+     * @var Repository
      */
     private $route_name;
 
     /**
-     * @var \Carbon\Carbon
+     * @var Carbon
      */
     private $route_expires;
 
