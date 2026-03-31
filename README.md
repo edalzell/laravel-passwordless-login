@@ -98,7 +98,7 @@ LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 
 ### Reporting Issues
 
-For security issues, please email me directly at ed@gros.co. For any other problems, use the issue tracker here.
+For security issues, please email me directly at `security@silentz.co`. For any other problems, use the issue tracker here.
 
 ### Contributing
 
