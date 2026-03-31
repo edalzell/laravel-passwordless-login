@@ -12,7 +12,7 @@ use Illuminate\Contracts\Auth\Authenticatable as User;
 class PasswordlessLoginManager
 {
     /**
-     * @var LoginUrl
+     * @var \Grosv\LaravelPasswordlessLogin\LoginUrl
      */
     private $loginUrl;
 
