@@ -2,6 +2,19 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.0.1 - 2026-03-31
+
+### 🐛 Fixed
+
+- Update the default user model namespace [@edalzell](https://github.com/edalzell) (#120)
+
+### 🧰 Maintenance
+
+- Update readme [@edalzell](https://github.com/edalzell) (#123)
+- Format readme [@edalzell](https://github.com/edalzell) (#122)
+- Fix styling [@edalzell](https://github.com/edalzell) (#121)
+- No assets to build [@edalzell](https://github.com/edalzell) (#119)
+
 ## v2.0.0 - 2026-02-26
 
 ### 🚀 New
