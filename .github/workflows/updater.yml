@@ -6,7 +6,7 @@ on:
     # Automatically run on every month
     - cron: '0 0 1 * *'
 permissions:
-  workflows: write
+  contents: write
 
 jobs:
   build:
