@@ -42,6 +42,11 @@ class PasswordlessLoginService
             ->retrieveById(request('uid'));
     }
 
+    public function cacheRequest(): void
+    {
+        $this->consumeRequest();
+    }
+
     public function consumeRequest(): void
     {
         $loginOnce = $this->usesTrait()
