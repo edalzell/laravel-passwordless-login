@@ -4,6 +4,7 @@ namespace Grosv\LaravelPasswordlessLogin;
 
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -42,7 +43,7 @@ class PasswordlessLoginService
             ->retrieveById(request('uid'));
     }
 
-    public function cacheRequest(): void
+    public function cacheRequest(Request $request): void
     {
         $this->consumeRequest();
     }
