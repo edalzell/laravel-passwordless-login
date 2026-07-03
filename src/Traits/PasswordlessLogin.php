@@ -56,6 +56,6 @@ trait PasswordlessLogin
 
     public function invalidateLoginLink(): void
     {
-        cache()->forget(UserClass::toSlug(get_class($this)).$this->getAuthIdentifier());
+        cache()->forget(UserClass::cacheKey($this));
     }
 }

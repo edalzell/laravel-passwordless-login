@@ -55,7 +55,7 @@ class LoginUrl
             ]
         );
 
-        cache()->put(UserClass::toSlug(get_class($this->user)).$this->user->getAuthIdentifier(), true, $this->route_expires);
+        cache()->put(UserClass::cacheKey($this->user), true, $this->route_expires);
 
         return $url;
     }

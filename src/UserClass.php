@@ -2,10 +2,16 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Str;
 
 class UserClass
 {
+    public static function cacheKey(Authenticatable $user): string
+    {
+        return static::toSlug(get_class($user)).$user->getAuthIdentifier();
+    }
+
     public static function toSlug(string $class): string
     {
         $pieces = array_map(function (string $piece): string {
