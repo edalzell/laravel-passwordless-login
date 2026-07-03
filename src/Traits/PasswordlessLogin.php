@@ -52,6 +52,4 @@ trait PasswordlessLogin
     {
         return PasswordlessLoginFacade::forUser($this)->generate();
     }
-
-
 }
