@@ -9,7 +9,9 @@ use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
+use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -158,5 +160,55 @@ class SignedUrlTest extends TestCase
         $this->actingAs($this->user);
         $response = $this->get($this->url.'&redirect_to=/happy_path');
         $response->assertRedirect('/happy_path');
+    }
+
+    #[Test]
+    public function a_link_invalidated_via_facade_cannot_be_used()
+    {
+        PasswordlessLogin::invalidateForUser($this->user);
+        $this->assertGuest();
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidSignatureException::class);
+        $this->get($this->url);
+        $this->assertGuest();
+    }
+
+    #[Test]
+    public function generating_a_new_link_clears_invalidation()
+    {
+        PasswordlessLogin::invalidateForUser($this->user);
+        $this->url = (new LoginUrl($this->user))->generate();
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function a_use_once_link_cannot_be_used_twice()
+    {
+        Config::set('laravel-passwordless-login.login_use_once', true);
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+        Auth::logout();
+
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidSignatureException::class);
+        $this->get($this->url);
+    }
+
+    #[Test]
+    public function a_multi_use_link_can_be_used_multiple_times()
+    {
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+        Auth::logout();
+
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+        Auth::logout();
     }
 }

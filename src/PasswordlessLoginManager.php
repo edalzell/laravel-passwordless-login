@@ -51,4 +51,9 @@ class PasswordlessLoginManager
     {
         return $this->loginUrl->generate();
     }
+
+    public function invalidateForUser(User $user): void
+    {
+        cache()->forget(UserClass::cacheKey($user));
+    }
 }
