@@ -11,7 +11,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Routing\Redirector;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Support\Facades\Auth;
-use Psr\SimpleCache\InvalidArgumentException;
 
 class LaravelPasswordlessLoginController extends Controller
 {
@@ -40,7 +39,7 @@ class LaravelPasswordlessLoginController extends Controller
      *
      * @return RedirectResponse|Redirector
      *
-     * @throws InvalidArgumentException|InvalidSignatureException|ExpiredSignatureException
+     * @throws InvalidSignatureException|ExpiredSignatureException
      */
     public function login(Request $request)
     {
@@ -51,7 +50,7 @@ class LaravelPasswordlessLoginController extends Controller
             throw new ExpiredSignatureException;
         }
 
-        $this->passwordlessLoginService->cacheRequest($request);
+        $this->passwordlessLoginService->consumeRequest();
 
         $user = $this->passwordlessLoginService->user;
 

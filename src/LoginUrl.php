@@ -43,9 +43,9 @@ class LoginUrl
         $this->redirect_url = $redirectUrl;
     }
 
-    public function generate()
+    public function generate(): string
     {
-        return URL::temporarySignedRoute(
+        $url = URL::temporarySignedRoute(
             $this->route_name,
             $this->route_expires,
             [
@@ -54,5 +54,9 @@ class LoginUrl
                 'user_type' => UserClass::toSlug(get_class($this->user)),
             ]
         );
+
+        cache()->put(UserClass::toSlug(get_class($this->user)) . $this->user->getAuthIdentifier(), true, $this->route_expires);
+
+        return $url;
     }
 }

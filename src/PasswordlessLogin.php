@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static \Grosv\LaravelPasswordlessLogin\PasswordlessLoginManager forUser(User $user)
  * @method static string generate()
+ * @method static void invalidateForUser(User $user)
  */
 class PasswordlessLogin extends Facade
 {
