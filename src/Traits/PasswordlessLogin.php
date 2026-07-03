@@ -4,7 +4,6 @@ namespace Grosv\LaravelPasswordlessLogin\Traits;
 
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin as PasswordlessLoginFacade;
-use Grosv\LaravelPasswordlessLogin\UserClass;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
@@ -54,8 +53,5 @@ trait PasswordlessLogin
         return PasswordlessLoginFacade::forUser($this)->generate();
     }
 
-    public function invalidateLoginLink(): void
-    {
-        cache()->forget(UserClass::cacheKey($this));
-    }
+
 }

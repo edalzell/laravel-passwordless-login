@@ -174,20 +174,6 @@ class SignedUrlTest extends TestCase
     }
 
     #[Test]
-    public function a_link_invalidated_via_trait_cannot_be_used()
-    {
-        $generator = new LoginUrl($this->model_user);
-        $modelUrl = $generator->generate();
-        $this->model_user->invalidateLoginLink();
-
-        $this->assertGuest();
-        $this->withoutExceptionHandling();
-        $this->expectException(InvalidSignatureException::class);
-        $this->get($modelUrl);
-        $this->assertGuest();
-    }
-
-    #[Test]
     public function generating_a_new_link_clears_invalidation()
     {
         PasswordlessLogin::invalidateForUser($this->user);
