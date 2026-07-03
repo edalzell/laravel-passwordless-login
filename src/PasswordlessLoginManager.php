@@ -2,7 +2,6 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
-use Grosv\LaravelPasswordlessLogin\UserClass;
 use Illuminate\Contracts\Auth\Authenticatable as User;
 
 /**
@@ -55,6 +54,6 @@ class PasswordlessLoginManager
 
     public function invalidateForUser(User $user): void
     {
-        cache()->forget(UserClass::toSlug(get_class($user)) . $user->getAuthIdentifier());
+        cache()->forget(UserClass::toSlug(get_class($user)).$user->getAuthIdentifier());
     }
 }

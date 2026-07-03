@@ -18,7 +18,7 @@ class PasswordlessLoginService
     public function __construct()
     {
         $this->user = $this->getUser();
-        $this->cacheKey = request('user_type') . request('uid');
+        $this->cacheKey = request('user_type').request('uid');
     }
 
     /**
