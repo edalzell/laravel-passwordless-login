@@ -92,9 +92,24 @@ LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 
 `LPL_REDIRECT_ON_LOGIN` is where you want to send the user after they've logged in by clicking their magic link.
 
-`LPL_USE_ONCE` is whether you want a link to expire after first use (uses cache to store used links)
+`LPL_USE_ONCE` is whether you want a link to expire after first use. When enabled, the link is consumed on first use and cannot be used again.
 
 `LPL_INVALID_SIGNATURE_MESSAGE` is a custom message sent when we abort with a 401 status on an invalid or expired link. You can also add some custom logic on how to deal with invalid or expired links by handling `InvalidSignatureException` and `ExpiredSignatureException` in your `Handler.php` file.
+
+### Invalidating Links
+
+Links can be explicitly revoked before they expire — for example, after a user sets a password or changes their email.
+
+```php
+use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
+
+// Revoke any outstanding magic link for a user
+PasswordlessLogin::invalidateForUser($user);
+```
+
+Generating a new link for a user automatically clears any prior invalidation, so calling `generate()` is all you need to issue a fresh link.
+
+> **Note:** Magic links are tracked in the cache. If your cache is cleared, any links generated before the flush will be treated as invalid. This is intentional — a cleared cache is safer than silently reactivating revoked links.
 
 ### Reporting Issues
 
