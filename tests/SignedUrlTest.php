@@ -4,6 +4,7 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Faker\Factory as Faker;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkUsed;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
@@ -12,6 +13,7 @@ use Grosv\LaravelPasswordlessLogin\Models\User;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\Attributes\Test;
 
@@ -71,9 +73,11 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function a_signed_request_will_log_user_in_and_redirect()
     {
+        Event::fake();
         $this->withoutExceptionHandling();
         $this->assertGuest();
         $response = $this->followingRedirects()->get($this->url);
+        Event::assertDispatched(LoginLinkUsed::class);
         $this->assertAuthenticatedAs($this->user);
         $response->assertSuccessful();
         Auth::logout();
@@ -83,20 +87,26 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function an_unsigned_request_will_not_log_user_in()
     {
+        Event::fake();
         $unsigned = explode('?', $this->url)[0];
         $this->assertGuest();
         $this->withoutExceptionHandling();
         $this->expectException(InvalidSignatureException::class);
         $this->get($unsigned);
+        Event::assertNotDispatched(LoginLinkUsed::class);
+
         $this->assertGuest();
     }
 
     #[Test]
     public function an_invalid_signature_request_will_not_log_user_in()
     {
+        Event::fake();
+
         // Check 401 is returned
         $this->assertGuest();
         $response = $this->get($this->url.'tampered');
+        Event::assertNotDispatched(LoginLinkUsed::class);
         $response->assertStatus(401);
         $this->assertGuest();
 
