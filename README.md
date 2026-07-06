@@ -117,7 +117,7 @@ The package dispatches events during the login flow that you can listen for, e.g
 
 | Event | Dispatched when | `$user` |
 | --- | --- | --- |
-| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkUsed` | A valid, unexpired link successfully logs the user in. | Always present. |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful` | A valid, unexpired link successfully logs the user in. | Always present. |
 | `Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired` | A correctly signed link is used after it has expired. | Always present. |
 | `Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid` | A request has an invalid or missing signature (e.g. tampered URL, or a URL missing its signed query parameters entirely). | May be `null` if the user couldn't be identified from the request. |
 
