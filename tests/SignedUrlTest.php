@@ -4,6 +4,7 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Faker\Factory as Faker;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired;
 use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
 use Grosv\LaravelPasswordlessLogin\Events\LoginLinkUsed;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
@@ -146,11 +147,14 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function an_expired_request_will_not_log_user_in()
     {
+        Event::fake();
         Carbon::setTestNow(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires') + 1));
         // Make sure 401 is returned
         $this->assertGuest();
         $response = $this->get($this->url);
         $response->assertStatus(401);
+        Event::assertNotDispatched(LoginLinkUsed::class);
+        Event::assertDispatched(LoginLinkExpired::class);
         $this->assertGuest();
 
         // Make sure ExpiredSignatureException is thrown
