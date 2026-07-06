@@ -4,6 +4,7 @@ namespace Tests;
 
 use Carbon\Carbon;
 use Faker\Factory as Faker;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
 use Grosv\LaravelPasswordlessLogin\Events\LoginLinkUsed;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
@@ -90,12 +91,15 @@ class SignedUrlTest extends TestCase
         Event::fake();
         $unsigned = explode('?', $this->url)[0];
         $this->assertGuest();
+
+        $this->get($unsigned);
+        Event::assertNotDispatched(LoginLinkUsed::class);
+        Event::assertDispatched(LoginLinkInvalid::class);
+        $this->assertGuest();
+
         $this->withoutExceptionHandling();
         $this->expectException(InvalidSignatureException::class);
         $this->get($unsigned);
-        Event::assertNotDispatched(LoginLinkUsed::class);
-
-        $this->assertGuest();
     }
 
     #[Test]
@@ -153,7 +157,6 @@ class SignedUrlTest extends TestCase
         $this->withoutExceptionHandling();
         $this->expectException(ExpiredSignatureException::class);
         $this->get($this->url);
-        $this->assertGuest();
     }
 
     #[Test]
@@ -177,10 +180,13 @@ class SignedUrlTest extends TestCase
     {
         PasswordlessLogin::invalidateForUser($this->user);
         $this->assertGuest();
+
+        $this->get($this->url);
+        $this->assertGuest();
+
         $this->withoutExceptionHandling();
         $this->expectException(InvalidSignatureException::class);
         $this->get($this->url);
-        $this->assertGuest();
     }
 
     #[Test]
