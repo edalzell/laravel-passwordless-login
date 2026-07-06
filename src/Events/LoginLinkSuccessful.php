@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class LoginLinkUsed
+class LoginLinkSuccessful
 {
     use Dispatchable, InteractsWithSockets,  SerializesModels;
 

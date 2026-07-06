@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Faker\Factory as Faker;
 use Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired;
 use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
-use Grosv\LaravelPasswordlessLogin\Events\LoginLinkUsed;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
@@ -79,7 +79,7 @@ class SignedUrlTest extends TestCase
         $this->withoutExceptionHandling();
         $this->assertGuest();
         $response = $this->followingRedirects()->get($this->url);
-        Event::assertDispatched(LoginLinkUsed::class);
+        Event::assertDispatched(LoginLinkSuccessful::class);
         $this->assertAuthenticatedAs($this->user);
         $response->assertSuccessful();
         Auth::logout();
@@ -94,7 +94,7 @@ class SignedUrlTest extends TestCase
         $this->assertGuest();
 
         $this->get($unsigned);
-        Event::assertNotDispatched(LoginLinkUsed::class);
+        Event::assertNotDispatched(LoginLinkSuccessful::class);
         Event::assertDispatched(LoginLinkInvalid::class);
         $this->assertGuest();
 
@@ -111,7 +111,7 @@ class SignedUrlTest extends TestCase
         // Check 401 is returned
         $this->assertGuest();
         $response = $this->get($this->url.'tampered');
-        Event::assertNotDispatched(LoginLinkUsed::class);
+        Event::assertNotDispatched(LoginLinkSuccessful::class);
         $response->assertStatus(401);
         $this->assertGuest();
 
@@ -153,7 +153,7 @@ class SignedUrlTest extends TestCase
         $this->assertGuest();
         $response = $this->get($this->url);
         $response->assertStatus(401);
-        Event::assertNotDispatched(LoginLinkUsed::class);
+        Event::assertNotDispatched(LoginLinkSuccessful::class);
         Event::assertDispatched(LoginLinkExpired::class);
         $this->assertGuest();
 
