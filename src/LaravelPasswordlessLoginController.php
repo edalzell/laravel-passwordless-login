@@ -2,6 +2,9 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Illuminate\Http\RedirectResponse;
@@ -45,8 +48,12 @@ class LaravelPasswordlessLoginController extends Controller
     {
         if (! $this->urlGenerator->hasCorrectSignature($request) ||
             ($this->urlGenerator->signatureHasNotExpired($request) && ! $this->passwordlessLoginService->requestIsNew())) {
+            LoginLinkInvalid::dispatch($this->passwordlessLoginService->user);
+
             throw new InvalidSignatureException;
         } elseif (! $this->urlGenerator->signatureHasNotExpired($request)) {
+            LoginLinkExpired::dispatch($this->passwordlessLoginService->user);
+
             throw new ExpiredSignatureException;
         }
 
@@ -65,6 +72,8 @@ class LaravelPasswordlessLoginController extends Controller
 
             abort_unless($user == Auth::guard($guard)->user(), 401);
         }
+
+        LoginLinkSuccessful::dispatch($user);
 
         return $user->guard_name ? $user->onPasswordlessLoginSuccess($request) : redirect($redirectUrl);
     }

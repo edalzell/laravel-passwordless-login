@@ -111,6 +111,31 @@ Generating a new link for a user automatically clears any prior invalidation, so
 
 > **Note:** Magic links are tracked in the cache. If your cache is cleared, any links generated before the flush will be treated as invalid. This is intentional — a cleared cache is safer than silently reactivating revoked links.
 
+### Events
+
+The package dispatches events during the login flow that you can listen for, e.g. for auditing or alerting on suspicious activity:
+
+| Event | Dispatched when | `$user` |
+| --- | --- | --- |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful` | A valid, unexpired link successfully logs the user in. | Always present. |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired` | A correctly signed link is used after it has expired. | Always present. |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid` | A request has an invalid or missing signature (e.g. tampered URL, or a URL missing its signed query parameters entirely). | May be `null` if the user couldn't be identified from the request. |
+
+```php
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
+
+class LogSuspiciousLoginAttempt
+{
+    public function handle(LoginLinkInvalid $event): void
+    {
+        // $event->user may be null
+        logger()->warning('Invalid passwordless login attempt', [
+            'user_id' => $event->user?->id,
+        ]);
+    }
+}
+```
+
 ### Reporting Issues
 
 For security issues, please email me directly at `security@silentz.co`. For any other problems, use the issue tracker here.
