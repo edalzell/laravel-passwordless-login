@@ -1,7 +1,6 @@
 <?php
 
 use Grosv\LaravelPasswordlessLogin\UserClass;
-use PHPUnit\Framework\Attributes\Test;
 
 test('make from class', function () {
     $slug = UserClass::toSlug('HelloWorld\\ModelsFolder\\User');

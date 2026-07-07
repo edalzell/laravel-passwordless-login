@@ -7,9 +7,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\Attributes\Test;
 use Tests\Fixtures\AdminUser;
-
 
 beforeEach(function () {
     Config::set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);

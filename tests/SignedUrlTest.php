@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
-use Orchestra\Testbench\Attributes\WithConfig;
-use PHPUnit\Framework\Attributes\Test;
-
 
 beforeEach(function () {
     $faker = Faker::create();
