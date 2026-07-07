@@ -13,22 +13,22 @@ trait PasswordlessLogin
 {
     protected function guardName(): Attribute
     {
-        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.user_guard'));
+        return Attribute::make(get: fn (): string => config()->string('laravel-passwordless-login.user_guard'));
     }
 
     protected function shouldRememberLogin(): Attribute
     {
-        return Attribute::make(get: fn (): bool => config('laravel-passwordless-login.remember_login'));
+        return Attribute::make(get: fn (): bool => config()->boolean('laravel-passwordless-login.remember_login'));
     }
 
     protected function loginRouteExpiresIn(): Attribute
     {
-        return Attribute::make(get: fn (): int => config('laravel-passwordless-login.login_route_expires'));
+        return Attribute::make(get: fn (): int => config()->integer('laravel-passwordless-login.login_route_expires'));
     }
 
     protected function redirectUrl(): Attribute
     {
-        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.redirect_on_success'));
+        return Attribute::make(get: fn (): string => config()->string('laravel-passwordless-login.redirect_on_success'));
     }
 
     protected function loginUseOnce(): Attribute
