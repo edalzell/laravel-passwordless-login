@@ -44,4 +44,4 @@ jobs:
         run: composer show -D
 
       - name: Run tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/pest
