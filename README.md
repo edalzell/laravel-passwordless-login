@@ -67,6 +67,24 @@ If you are using the PasswordlessLogin Trait, you can generate a link using the 
 
 The biggest mistake I could see someone making with this package is creating a login link for one user and sending it to another. Please be careful and test your code. I don't want anyone getting mad at me for someone else's silliness.
 
+### Multiple Guards
+
+If you have more than one user-type model authenticated on different guards (e.g. `User` on `web` and `Admin` on `admin`), override `getGuardNameAttribute()` on each model to return its own guard instead of the globally configured one:
+
+```php
+class Admin extends Authenticatable
+{
+    use PasswordlessLogin;
+
+    public function getGuardNameAttribute(): string
+    {
+        return 'admin';
+    }
+}
+```
+
+The package uses this to both retrieve and log in the user with the correct guard, so a link generated for an `Admin` is authenticated against the `admin` guard rather than `LPL_USER_GUARD`.
+
 ### Configuration
 You can publish the config file or just set the values you want to use in your .env file:
 ```dotenv
