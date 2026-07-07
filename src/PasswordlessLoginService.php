@@ -4,8 +4,10 @@ namespace Grosv\LaravelPasswordlessLogin;
 
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
 use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 /**
  * Service class to keep the controller clean.
@@ -16,10 +18,14 @@ class PasswordlessLoginService
 
     public ?Authenticatable $user;
 
-    public function __construct()
-    {
+    public function __construct(
+        private readonly Request $request,
+        private readonly AuthFactory $auth,
+        private readonly CacheRepository $cache,
+        private readonly ConfigRepository $config,
+    ) {
         $this->user = $this->getUser();
-        $this->cacheKey = request('user_type').request('uid');
+        $this->cacheKey = $this->requestValue('user_type').$this->requestValue('uid');
     }
 
     /**
@@ -34,16 +40,16 @@ class PasswordlessLoginService
 
     public function getUser(): ?Authenticatable
     {
-        if (! request()->has('user_type')) {
+        if (! $this->request->has('user_type')) {
             return null;
         }
 
-        $userClass = UserClass::fromSlug(request('user_type'));
-        $guard = (new $userClass)->guard_name ?? config('laravel-passwordless-login.user_guard');
+        $userClass = UserClass::fromSlug($this->requestValue('user_type'));
+        $guard = (new $userClass)->guard_name ?? $this->config->get('laravel-passwordless-login.user_guard');
 
-        return Auth::guard($guard)
+        return $this->auth->guard($guard)
             ->getProvider()
-            ->retrieveById(request('uid'));
+            ->retrieveById($this->requestValue('uid'));
     }
 
     public function cacheRequest(Request $request): void
@@ -55,15 +61,20 @@ class PasswordlessLoginService
     {
         $loginOnce = $this->usesTrait()
             ? $this->user->login_use_once
-            : config('laravel-passwordless-login.login_use_once');
+            : $this->config->get('laravel-passwordless-login.login_use_once');
 
         if ($loginOnce) {
-            cache()->forget($this->cacheKey);
+            $this->cache->forget($this->cacheKey);
         }
     }
 
     public function requestIsNew(): bool
     {
-        return cache()->has($this->cacheKey);
+        return $this->cache->has($this->cacheKey);
+    }
+
+    private function requestValue(string $key): string
+    {
+        return (string) ($this->request->route($key) ?? $this->request->input($key, ''));
     }
 }

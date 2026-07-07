@@ -2,19 +2,29 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Routing\Redirector;
 
 class HandleAuthenticatedUsers
 {
+    public function __construct(
+        private readonly Application $app,
+        private readonly AuthFactory $auth,
+        private readonly ConfigRepository $config,
+        private readonly Redirector $redirector,
+    ) {}
+
     public function handle(Request $request, \Closure $next, ...$guards)
     {
         $guards = empty($guards) ? [null] : $guards;
 
         foreach ($guards as $guard) {
-            if (Auth::guard($guard)->check()) {
+            if ($this->auth->guard($guard)->check()) {
 
-                return redirect($request->get('redirect_to', self::getHomeRoute()));
+                return $this->redirector->to($request->get('redirect_to', $this->getHomeRoute()));
             }
         }
 
@@ -27,9 +37,9 @@ class HandleAuthenticatedUsers
      *
      * @static function getHomeRoute
      */
-    private static function getHomeRoute(): string
+    private function getHomeRoute(): string
     {
-        $provider_name = '\\'.app()->getNamespace().'Providers\\RouteServiceProvider';
+        $provider_name = '\\'.$this->app->getNamespace().'Providers\\RouteServiceProvider';
 
         if (class_exists($provider_name)) {
             if (method_exists($provider_name, 'home')) {
@@ -41,6 +51,6 @@ class HandleAuthenticatedUsers
             }
         }
 
-        return config('laravel-passwordless-login.redirect_on_success', '/');
+        return $this->config->get('laravel-passwordless-login.redirect_on_success', '/');
     }
 }
