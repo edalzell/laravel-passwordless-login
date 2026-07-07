@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Orchestra\Testbench\Attributes\WithConfig;
 use PHPUnit\Framework\Attributes\Test;
 
 class SignedUrlTest extends TestCase
@@ -218,6 +219,16 @@ class SignedUrlTest extends TestCase
         $this->withoutExceptionHandling();
         $this->expectException(InvalidSignatureException::class);
         $this->get($this->url);
+    }
+
+    #[Test]
+    #[WithConfig('laravel-passwordless-login.login_route_action', 'post', false)]
+    public function a_configured_post_route_action_will_log_user_in()
+    {
+        $this->assertGuest();
+        $response = $this->followingRedirects()->post($this->url);
+        $response->assertSuccessful();
+        $this->assertAuthenticatedAs($this->user);
     }
 
     #[Test]
