@@ -6,7 +6,6 @@ use Faker\Factory as Faker;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
