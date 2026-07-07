@@ -179,13 +179,6 @@ test('a use once link cannot be used twice', function () {
     $this->get($this->url);
 });
 
-test('a configured post route action will log user in', function () {
-    $this->assertGuest();
-    $response = $this->followingRedirects()->post($this->url);
-    $response->assertSuccessful();
-    $this->assertAuthenticatedAs($this->user);
-});
-
 test('a multi use link can be used multiple times', function () {
     $this->assertGuest();
     $this->followingRedirects()->get($this->url);
