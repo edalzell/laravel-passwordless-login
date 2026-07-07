@@ -4,35 +4,36 @@ namespace Grosv\LaravelPasswordlessLogin\Traits;
 
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin as PasswordlessLoginFacade;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 
 trait PasswordlessLogin
 {
-    public function getGuardNameAttribute(): string
+    protected function guardName(): Attribute
     {
-        return config('laravel-passwordless-login.user_guard');
+        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.user_guard'));
     }
 
-    public function getShouldRememberLoginAttribute(): bool
+    protected function shouldRememberLogin(): Attribute
     {
-        return config('laravel-passwordless-login.remember_login');
+        return Attribute::make(get: fn (): bool => config('laravel-passwordless-login.remember_login'));
     }
 
-    public function getLoginRouteExpiresInAttribute(): int
+    protected function loginRouteExpiresIn(): Attribute
     {
-        return config('laravel-passwordless-login.login_route_expires');
+        return Attribute::make(get: fn (): int => config('laravel-passwordless-login.login_route_expires'));
     }
 
-    public function getRedirectUrlAttribute(): string
+    protected function redirectUrl(): Attribute
     {
-        return config('laravel-passwordless-login.redirect_on_success');
+        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.redirect_on_success'));
     }
 
-    public function getLoginUseOnceAttribute(): bool
+    protected function loginUseOnce(): Attribute
     {
-        return config()->boolean('laravel-passwordless-login.login_use_once');
+        return Attribute::make(get: fn (): bool => config()->boolean('laravel-passwordless-login.login_use_once'));
     }
 
     public function createPasswordlessLoginLink(): string
@@ -45,7 +46,7 @@ trait PasswordlessLogin
      */
     public function onPasswordlessLoginSuccess(Request $request): RedirectResponse|Redirector
     {
-        return ($request->has('redirect_to')) ? redirect($request->redirect_to) : redirect($this->getRedirectUrlAttribute());
+        return ($request->has('redirect_to')) ? redirect($request->redirect_to) : redirect($this->redirect_url);
     }
 
     public function generateLoginUrl(): string
