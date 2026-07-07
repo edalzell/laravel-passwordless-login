@@ -1,6 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\PostRoute;
+
+use Tests\TestCase;
 
 class PostRouteActionTestCase extends TestCase
 {
