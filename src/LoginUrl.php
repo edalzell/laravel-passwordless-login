@@ -8,37 +8,37 @@ use Illuminate\Support\Facades\URL;
 
 class LoginUrl
 {
-    private readonly string $route_name;
+    private readonly string $routeName;
 
-    private readonly Carbon $route_expires;
+    private readonly Carbon $routeExpires;
 
-    private ?string $redirect_url = null;
+    private ?string $redirectUrl = null;
 
     public function __construct(private readonly User $user)
     {
-        $this->route_expires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
+        $this->routeExpires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
 
-        $this->route_name = config('laravel-passwordless-login.login_route_name');
+        $this->routeName = config('laravel-passwordless-login.login_route_name');
     }
 
     public function setRedirectUrl(string $redirectUrl): void
     {
-        $this->redirect_url = $redirectUrl;
+        $this->redirectUrl = $redirectUrl;
     }
 
     public function generate(): string
     {
         $url = URL::temporarySignedRoute(
-            $this->route_name,
-            $this->route_expires,
+            $this->routeName,
+            $this->routeExpires,
             [
                 'uid' => $this->user->getAuthIdentifier(),
-                'redirect_to' => $this->redirect_url,
+                'redirect_to' => $this->redirectUrl,
                 'user_type' => UserClass::toSlug(get_class($this->user)),
             ]
         );
 
-        cache()->put(UserClass::cacheKey($this->user), true, $this->route_expires);
+        cache()->put(UserClass::cacheKey($this->user), true, $this->routeExpires);
 
         return $url;
     }
