@@ -1,26 +1,16 @@
 <?php
 
-namespace Tests\Unit;
-
 use Grosv\LaravelPasswordlessLogin\UserClass;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\TestCase;
 
-class UserClassTest extends TestCase
-{
-    #[Test]
-    public function make_from_class()
-    {
-        $slug = UserClass::toSlug('HelloWorld\\ModelsFolder\\User');
+test('make from class', function () {
+    $slug = UserClass::toSlug('HelloWorld\\ModelsFolder\\User');
 
-        $this->assertEquals('hello_world-models_folder-user', $slug);
-    }
+    expect($slug)->toEqual('hello_world-models_folder-user');
+});
 
-    #[Test]
-    public function make_from_slug()
-    {
-        $userClass = UserClass::fromSlug('hello_world-models_folder-user');
+test('make from slug', function () {
+    $userClass = UserClass::fromSlug('hello_world-models_folder-user');
 
-        $this->assertEquals('HelloWorld\\ModelsFolder\\User', $userClass);
-    }
-}
+    expect($userClass)->toEqual('HelloWorld\\ModelsFolder\\User');
+});
