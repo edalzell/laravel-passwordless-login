@@ -73,6 +73,7 @@ You can publish the config file or just set the values you want to use in your .
 LPL_USER_MODEL=App\User
 LPL_REMEMBER_LOGIN=false
 LPL_LOGIN_ROUTE=/magic-login
+LPL_LOGIN_ROUTE_ACTION=get
 LPL_LOGIN_ROUTE_NAME=magic-login
 LPL_LOGIN_ROUTE_EXPIRES=30
 LPL_REDIRECT_ON_LOGIN=/
@@ -85,6 +86,8 @@ LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 `LPL_REMEMBER_LOGIN` is whether you want to remember the login (like the user checking Remember Me)
 
 `LPL_LOGIN_ROUTE` is the route that points to the login function this package provides. Make sure you don't collide with one of your other routes.
+
+`LPL_LOGIN_ROUTE_ACTION` is the HTTP verb the login route responds to, e.g. `get` or `post`. Defaults to `get`. If you use `post`, you'll need to exclude the route from CSRF verification — see [Laravel's CSRF documentation](https://laravel.com/docs/13.x/csrf#csrf-excluding-uris).
 
 `LPL_LOGIN_ROUTE_NAME` is the name of the LPL_LOGIN_ROUTE. Again, make sure it doesn't collide with any of your existing route names.
 
