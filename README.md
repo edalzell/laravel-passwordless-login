@@ -36,30 +36,31 @@ Because some sites have more than one user-type model (users, admins, etc.), you
 
 ```php
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use PasswordlessLogin;
 
-    public function getGuardNameAttribute(): string
+    protected function guardName(): Attribute
     {
-        return config('laravel-passwordless-login.user_guard');
+        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.user_guard'));
     }
 
-    public function getShouldRememberLoginAttribute(): bool
+    protected function shouldRememberLogin(): Attribute
     {
-        return config('laravel-passwordless-login.remember_login');
+        return Attribute::make(get: fn (): bool => config('laravel-passwordless-login.remember_login'));
     }
 
-    public function getLoginRouteExpiresInAttribute(): int
+    protected function loginRouteExpiresIn(): Attribute
     {
-        return config('laravel-passwordless-login.login_route_expires');
+        return Attribute::make(get: fn (): int => config('laravel-passwordless-login.login_route_expires'));
     }
 
-    public function getRedirectUrlAttribute(): string
+    protected function redirectUrl(): Attribute
     {
-        return config('laravel-passwordless-login.redirect_on_success');
+        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.redirect_on_success'));
     }
 }
 ```
@@ -67,12 +68,31 @@ If you are using the PasswordlessLogin Trait, you can generate a link using the 
 
 The biggest mistake I could see someone making with this package is creating a login link for one user and sending it to another. Please be careful and test your code. I don't want anyone getting mad at me for someone else's silliness.
 
+### Multiple Guards
+
+If you have more than one user-type model authenticated on different guards (e.g. `User` on `web` and `Admin` on `admin`), override `guardName()` on each model to return its own guard instead of the globally configured one:
+
+```php
+class Admin extends Authenticatable
+{
+    use PasswordlessLogin;
+
+    protected function guardName(): Attribute
+    {
+        return Attribute::make(get: fn (): string => 'admin');
+    }
+}
+```
+
+The package uses this to both retrieve and log in the user with the correct guard, so a link generated for an `Admin` is authenticated against the `admin` guard rather than `LPL_USER_GUARD`.
+
 ### Configuration
 You can publish the config file or just set the values you want to use in your .env file:
 ```dotenv
 LPL_USER_MODEL=App\User
 LPL_REMEMBER_LOGIN=false
 LPL_LOGIN_ROUTE=/magic-login
+LPL_LOGIN_ROUTE_ACTION=get
 LPL_LOGIN_ROUTE_NAME=magic-login
 LPL_LOGIN_ROUTE_EXPIRES=30
 LPL_REDIRECT_ON_LOGIN=/
@@ -85,6 +105,8 @@ LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 `LPL_REMEMBER_LOGIN` is whether you want to remember the login (like the user checking Remember Me)
 
 `LPL_LOGIN_ROUTE` is the route that points to the login function this package provides. Make sure you don't collide with one of your other routes.
+
+`LPL_LOGIN_ROUTE_ACTION` is the HTTP verb the login route responds to, e.g. `get` or `post`. Defaults to `get`. If you use `post`, you'll need to exclude the route from CSRF verification — see [Laravel's CSRF documentation](https://laravel.com/docs/13.x/csrf#csrf-excluding-uris).
 
 `LPL_LOGIN_ROUTE_NAME` is the name of the LPL_LOGIN_ROUTE. Again, make sure it doesn't collide with any of your existing route names.
 
@@ -110,6 +132,31 @@ PasswordlessLogin::invalidateForUser($user);
 Generating a new link for a user automatically clears any prior invalidation, so calling `generate()` is all you need to issue a fresh link.
 
 > **Note:** Magic links are tracked in the cache. If your cache is cleared, any links generated before the flush will be treated as invalid. This is intentional — a cleared cache is safer than silently reactivating revoked links.
+
+### Events
+
+The package dispatches events during the login flow that you can listen for, e.g. for auditing or alerting on suspicious activity:
+
+| Event | Dispatched when | `$user` |
+| --- | --- | --- |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful` | A valid, unexpired link successfully logs the user in. | Always present. |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkExpired` | A correctly signed link is used after it has expired. | Always present. |
+| `Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid` | A request has an invalid or missing signature (e.g. tampered URL, or a URL missing its signed query parameters entirely). | May be `null` if the user couldn't be identified from the request. |
+
+```php
+use Grosv\LaravelPasswordlessLogin\Events\LoginLinkInvalid;
+
+class LogSuspiciousLoginAttempt
+{
+    public function handle(LoginLinkInvalid $event): void
+    {
+        // $event->user may be null
+        logger()->warning('Invalid passwordless login attempt', [
+            'user_id' => $event->user?->id,
+        ]);
+    }
+}
+```
 
 ### Reporting Issues
 

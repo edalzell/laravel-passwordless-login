@@ -2,6 +2,17 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.1.0 - 2026-07-03
+
+### 🚀 New
+
+- Invalidate links [@edalzell](https://github.com/edalzell) (#129)
+
+### 🧰 Maintenance
+
+- Update GitHub Action Versions [@edalzell](https://github.com/edalzell) (#128)
+- Bump shivammathur/setup-php from 2.37.0 to 2.37.1 in /.github/workflows [@[dependabot[bot]](https://github.com/apps/dependabot)](https://github.com/[dependabot[bot]](https://github.com/apps/dependabot)) (#126)
+
 ## v2.0.1 - 2026-03-31
 
 ### 🐛 Fixed
