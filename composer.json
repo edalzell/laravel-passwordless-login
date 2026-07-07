@@ -21,7 +21,8 @@
     },
     "require-dev": {
         "orchestra/testbench": "^10.0|^11.0",
-        "pestphp/pest": "^4.7.5"
+        "pestphp/pest": "^4.7.5",
+        "laravel/pao": "^1.1"
     },
     "autoload": {
         "psr-4": {
