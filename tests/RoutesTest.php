@@ -4,9 +4,9 @@ use Faker\Factory as Faker;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Illuminate\Support\Str;
-use Tests\PostRoute\PostRouteActionTestCase;
+use Tests\RoutesTestCase;
 
-uses(PostRouteActionTestCase::class);
+uses(RoutesTestCase::class);
 
 beforeEach(function () {
     $faker = Faker::create();

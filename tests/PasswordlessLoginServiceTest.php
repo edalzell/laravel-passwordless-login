@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Tests\Fixtures\AdminUser;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 beforeEach(function () {
     Config::set('auth.guards.admin', ['driver' => 'session', 'provider' => 'admins']);

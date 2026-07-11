@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Tests\TestCase;
+
+uses(TestCase::class);
 
 beforeEach(function () {
     $faker = Faker::create();

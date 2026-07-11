@@ -1,10 +1,8 @@
 <?php
 
-namespace Tests\PostRoute;
+namespace Tests;
 
-use Tests\TestCase;
-
-class PostRouteActionTestCase extends TestCase
+class RoutesTestCase extends TestCase
 {
     protected function getEnvironmentSetUp($app)
     {
