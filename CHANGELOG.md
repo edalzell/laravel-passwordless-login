@@ -2,6 +2,26 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.2.0 - 2026-07-13
+
+### 🚀 New
+
+- Allow configuring a separate cache store for link markers [@edalzell](https://github.com/edalzell) (#144)
+- Make cache-marker requirement opt-in for link validity [@edalzell](https://github.com/edalzell) (#143)
+- Derive guard name from user_type when retrieving the user [@edalzell](https://github.com/edalzell) (#134)
+- Login route can be `post` [@edalzell](https://github.com/edalzell) (#133)
+- Dispatch events [@edalzell](https://github.com/edalzell) (#131)
+
+### 🐛 Fixed
+
+- Fix link invalidation [@edalzell](https://github.com/edalzell) (#142)
+
+### 🧰 Maintenance
+
+- Freeze time in test [@edalzell](https://github.com/edalzell) (#132)
+- General code tidying [@edalzell](https://github.com/edalzell) (#139)
+- camelCase properties [@edalzell](https://github.com/edalzell) (#136)
+
 ## v2.1.0 - 2026-07-03
 
 ### 🚀 New
