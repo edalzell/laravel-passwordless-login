@@ -36,31 +36,30 @@ Because some sites have more than one user-type model (users, admins, etc.), you
 
 ```php
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
     use PasswordlessLogin;
 
-    protected function guardName(): Attribute
+    public function getGuardNameAttribute(): string
     {
-        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.user_guard'));
+        return config('laravel-passwordless-login.user_guard');
     }
 
-    protected function shouldRememberLogin(): Attribute
+    public function getShouldRememberLoginAttribute(): bool
     {
-        return Attribute::make(get: fn (): bool => config('laravel-passwordless-login.remember_login'));
+        return config('laravel-passwordless-login.remember_login');
     }
 
-    protected function loginRouteExpiresIn(): Attribute
+    public function getLoginRouteExpiresInAttribute(): int
     {
-        return Attribute::make(get: fn (): int => config('laravel-passwordless-login.login_route_expires'));
+        return config('laravel-passwordless-login.login_route_expires');
     }
 
-    protected function redirectUrl(): Attribute
+    public function getRedirectUrlAttribute(): string
     {
-        return Attribute::make(get: fn (): string => config('laravel-passwordless-login.redirect_on_success'));
+        return config('laravel-passwordless-login.redirect_on_success');
     }
 }
 ```
@@ -70,16 +69,16 @@ The biggest mistake I could see someone making with this package is creating a l
 
 ### Multiple Guards
 
-If you have more than one user-type model authenticated on different guards (e.g. `User` on `web` and `Admin` on `admin`), override `guardName()` on each model to return its own guard instead of the globally configured one:
+If you have more than one user-type model authenticated on different guards (e.g. `User` on `web` and `Admin` on `admin`), override `getGuardNameAttribute()` on each model to return its own guard instead of the globally configured one:
 
 ```php
 class Admin extends Authenticatable
 {
     use PasswordlessLogin;
 
-    protected function guardName(): Attribute
+    public function getGuardNameAttribute(): string
     {
-        return Attribute::make(get: fn (): string => 'admin');
+        return 'admin';
     }
 }
 ```
