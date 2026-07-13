@@ -9,14 +9,17 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        laravel: [13.*, 12.*]
+        laravel: [12.*, 11.*]
         php: [8.5, 8.4, 8.3]
         stability: [prefer-lowest, prefer-stable]
         include:
-          - laravel: 13.*
-            testbench: 11.*
           - laravel: 12.*
             testbench: 10.*
+          - laravel: 11.*
+            testbench: ^9.16
+        exclude:
+          - php: 8.5
+            laravel: 11.*
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }}
 
     steps:

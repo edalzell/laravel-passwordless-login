@@ -3,25 +3,42 @@
 namespace Grosv\LaravelPasswordlessLogin;
 
 use Carbon\Carbon;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Auth\Authenticatable as User;
 use Illuminate\Support\Facades\URL;
 
 class LoginUrl
 {
-    private readonly string $routeName;
+    /**
+     * @var User
+     */
+    private $user;
 
-    private readonly Carbon $routeExpires;
+    /**
+     * @var Repository
+     */
+    private $route_name;
 
-    private ?string $redirectUrl = null;
+    /**
+     * @var Carbon
+     */
+    private $route_expires;
 
-    public function __construct(private readonly User $user)
+    /**
+     * @var string
+     */
+    private $redirect_url;
+
+    public function __construct(User $user)
     {
-        $this->routeExpires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
+        $this->user = $user;
+
+        $this->route_expires = now()->addMinutes($this->user->login_route_expires_in ?? config('laravel-passwordless-login.login_route_expires'));
 
         $this->routeName = config('laravel-passwordless-login.login_route_name');
     }
 
-    public function setRedirectUrl(string $redirectUrl): void
+    public function setRedirectUrl(string $redirectUrl)
     {
         $this->redirectUrl = $redirectUrl;
     }

@@ -17,10 +17,24 @@ use Illuminate\Support\Facades\Auth;
 
 class LaravelPasswordlessLoginController extends Controller
 {
-    public function __construct(
-        private readonly PasswordlessLoginService $passwordlessLoginService,
-        private readonly UrlGenerator $urlGenerator,
-    ) {}
+    /**
+     * @var PasswordlessLoginService
+     */
+    private $passwordlessLoginService;
+
+    /**
+     * @var UrlGenerator
+     */
+    private $urlGenerator;
+
+    /**
+     * LaravelPasswordlessLoginController constructor.
+     */
+    public function __construct(PasswordlessLoginService $passwordlessLoginService, UrlGenerator $urlGenerator)
+    {
+        $this->passwordlessLoginService = $passwordlessLoginService;
+        $this->urlGenerator = $urlGenerator;
+    }
 
     /**
      * Handles login from the signed route.
