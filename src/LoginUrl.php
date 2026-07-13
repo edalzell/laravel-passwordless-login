@@ -54,7 +54,7 @@ class LoginUrl
 
         // TTL must cover the furthest-out link, not just this one, or a later
         // short-lived link would prematurely evict an existing long-lived one.
-        cache()->put(
+        UserClass::store()->put(
             $key,
             $activeLinks,
             Carbon::createFromTimestamp(max(array_keys($activeLinks)))

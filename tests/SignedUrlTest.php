@@ -304,4 +304,23 @@ class SignedUrlTest extends TestCase
         $this->expectException(InvalidSignatureException::class);
         $this->get($this->url);
     }
+
+    #[Test]
+    public function markers_are_written_to_the_configured_cache_store_not_the_default()
+    {
+        Config::set('cache.stores.default_test_store', ['driver' => 'array']);
+        Config::set('cache.default', 'default_test_store');
+        Config::set('cache.stores.markers', ['driver' => 'array']);
+        Config::set('laravel-passwordless-login.cache_store', 'markers');
+
+        $key = UserClass::cacheKey($this->user);
+        $this->url = (new LoginUrl($this->user))->generate();
+
+        $this->assertTrue(cache()->store('markers')->has($key));
+        $this->assertFalse(cache()->store('default_test_store')->has($key));
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
 }

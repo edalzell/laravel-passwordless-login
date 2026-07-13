@@ -81,12 +81,12 @@ class PasswordlessLoginService
         unset($activeLinks[$this->expires()]);
 
         if (empty($activeLinks)) {
-            cache()->forget($this->cacheKey());
+            UserClass::store()->forget($this->cacheKey());
 
             return;
         }
 
-        cache()->put(
+        UserClass::store()->put(
             $this->cacheKey(),
             $activeLinks,
             Carbon::createFromTimestamp(max(array_keys($activeLinks)))
