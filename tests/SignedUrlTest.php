@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithConfig;
 use PHPUnit\Framework\Attributes\Test;
-use Tests\Fixtures\Models\User as ModelUser;
+use Tests\Fixtures\Models\User as TestUser;
 
 class SignedUrlTest extends TestCase
 {
@@ -46,7 +46,7 @@ class SignedUrlTest extends TestCase
             'remember_token' => Str::random(10),
         ]);
 
-        $this->model_user = ModelUser::create([
+        $this->model_user = TestUser::create([
             'name' => $faker->name,
             'email' => $faker->unique()->safeEmail,
             'email_verified_at' => now(),
