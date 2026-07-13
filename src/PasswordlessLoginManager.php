@@ -11,18 +11,12 @@ use Illuminate\Contracts\Auth\Authenticatable as User;
  */
 class PasswordlessLoginManager
 {
-    /**
-     * @var LoginUrl
-     */
-    private $loginUrl;
+    private LoginUrl $loginUrl;
 
     /**
      * This assigns the login url to the given user.
-     *
-     *
-     * @return $this
      */
-    public function forUser(User $user)
+    public function forUser(User $user): self
     {
         $this->loginUrl = new LoginUrl($user);
 
@@ -31,9 +25,6 @@ class PasswordlessLoginManager
 
     /**
      * Sets redirect URL for the Facade.
-     *
-     *
-     * @return $this
      */
     public function setRedirectUrl(string $redirectUrl): self
     {
@@ -44,10 +35,8 @@ class PasswordlessLoginManager
 
     /**
      * This generates the URL.
-     *
-     * @return string signed login url
      */
-    public function generate()
+    public function generate(): string
     {
         return $this->loginUrl->generate();
     }
