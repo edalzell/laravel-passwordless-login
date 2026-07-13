@@ -13,6 +13,7 @@ use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
+use Grosv\LaravelPasswordlessLogin\UserClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -184,6 +185,8 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function a_link_invalidated_via_facade_cannot_be_used()
     {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
         PasswordlessLogin::invalidateForUser($this->user);
         $this->assertGuest();
 
@@ -198,6 +201,8 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function generating_a_new_link_clears_invalidation()
     {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
         PasswordlessLogin::invalidateForUser($this->user);
         $this->url = (new LoginUrl($this->user))->generate();
 
@@ -270,5 +275,33 @@ class SignedUrlTest extends TestCase
 
         $this->followingRedirects()->get($second);
         $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function a_link_with_no_cache_marker_still_works_by_default()
+    {
+        // Simulates a link generated before this package tracked markers in the cache
+        // (see issue #140) — its signature and expiry are valid, but no marker exists.
+        cache()->forget(UserClass::cacheKey($this->user));
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function a_link_with_no_cache_marker_is_rejected_when_marker_is_required()
+    {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
+        cache()->forget(UserClass::cacheKey($this->user));
+
+        $this->assertGuest();
+        $this->get($this->url);
+        $this->assertGuest();
+
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidSignatureException::class);
+        $this->get($this->url);
     }
 }

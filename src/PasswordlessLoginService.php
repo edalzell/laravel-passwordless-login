@@ -35,6 +35,13 @@ class PasswordlessLoginService
         return UserClass::activeLinks($this->cacheKey());
     }
 
+    private function loginOnce(): bool
+    {
+        return $this->usesTrait()
+            ? $this->user->login_use_once
+            : config('laravel-passwordless-login.login_use_once');
+    }
+
     /**
      * Checks if this use class uses the PasswordlessLogable trait.
      */
@@ -66,11 +73,7 @@ class PasswordlessLoginService
 
     public function consumeRequest(): void
     {
-        $loginOnce = $this->usesTrait()
-            ? $this->user->login_use_once
-            : config('laravel-passwordless-login.login_use_once');
-
-        if (! $loginOnce) {
+        if (! $this->loginOnce()) {
             return;
         }
 
@@ -92,6 +95,10 @@ class PasswordlessLoginService
 
     public function requestIsNew(): bool
     {
+        if (! $this->loginOnce() && ! config('laravel-passwordless-login.require_cache_marker', false)) {
+            return true;
+        }
+
         return array_key_exists($this->expires(), $this->activeLinks());
     }
 }
