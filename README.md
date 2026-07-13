@@ -99,6 +99,7 @@ LPL_REDIRECT_ON_LOGIN=/
 LPL_USER_GUARD=web
 LPL_USE_ONCE=false
 LPL_REQUIRE_CACHE_MARKER=false
+LPL_CACHE_STORE=
 LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 ```
 `LPL_USER_MODEL` is the the authenticatable model you are logging in (usually App\Models\User)
@@ -119,6 +120,8 @@ LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 
 `LPL_REQUIRE_CACHE_MARKER` is whether a link must have a matching entry in the cache to be considered valid, which is what powers [invalidating links](#invalidating-links) before they expire. It defaults to `false` so that links generated before you adopted this feature (or before you upgraded across a version that introduced it) keep working based on their own signature and expiry alone. Turn it on if you need `invalidateForUser()` to actually revoke outstanding multi-use links — note that doing so also means a cleared or evicted cache will invalidate every outstanding link, so make sure your cache store is durable enough for your link lifetimes before enabling it. `LPL_USE_ONCE` links always check the cache marker regardless of this setting.
 
+`LPL_CACHE_STORE` is the name of the cache store (as defined in your `config/cache.php`) that link markers are read from and written to. Leave it blank to use your app's default (`cache.default`). Set it to point markers at a specific store when you need them to survive things that don't affect link validity — a `cache:clear` on deploy, a Redis restart, or `maxmemory` eviction on your general-purpose cache — which matters most once `LPL_REQUIRE_CACHE_MARKER=true`, since that's when marker survival determines whether a link still works.
+
 `LPL_INVALID_SIGNATURE_MESSAGE` is a custom message sent when we abort with a 401 status on an invalid or expired link. You can also add some custom logic on how to deal with invalid or expired links by handling `InvalidSignatureException` and `ExpiredSignatureException` in your `Handler.php` file.
 
 ### Invalidating Links
@@ -134,7 +137,7 @@ PasswordlessLogin::invalidateForUser($user);
 
 Generating a new link for a user automatically clears any prior invalidation, so calling `generate()` is all you need to issue a fresh link.
 
-> **Note:** `invalidateForUser()` only takes effect on multi-use links when `LPL_REQUIRE_CACHE_MARKER=true` (see [Configuration](#configuration)) — otherwise a link's own signature and expiry are all that's checked, and revocation is a no-op. With the marker required, magic links are tracked in the cache, so a cleared or evicted cache also invalidates every outstanding link — intentional, since a cleared cache is safer than silently reactivating a revoked link, but it means your cache store needs to be durable enough to outlive your longest-lived links. `LPL_USE_ONCE` links check the cache marker regardless of this setting, since consuming a link has always relied on it.
+> **Note:** `invalidateForUser()` only takes effect on multi-use links when `LPL_REQUIRE_CACHE_MARKER=true` (see [Configuration](#configuration)) — otherwise a link's own signature and expiry are all that's checked, and revocation is a no-op. With the marker required, magic links are tracked in the cache, so a cleared or evicted cache also invalidates every outstanding link — intentional, since a cleared cache is safer than silently reactivating a revoked link, but it means your cache store needs to be durable enough to outlive your longest-lived links. Use `LPL_CACHE_STORE` to point markers at a store dedicated to that purpose, separate from whatever your app flushes on deploy. `LPL_USE_ONCE` links check the cache marker regardless of this setting, since consuming a link has always relied on it.
 
 ### Events
 
