@@ -89,7 +89,6 @@ The package uses this to both retrieve and log in the user with the correct guar
 ### Configuration
 You can publish the config file or just set the values you want to use in your .env file:
 ```dotenv
-LPL_USER_MODEL=App\User
 LPL_REMEMBER_LOGIN=false
 LPL_LOGIN_ROUTE=/magic-login
 LPL_LOGIN_ROUTE_ACTION=get
@@ -102,8 +101,6 @@ LPL_REQUIRE_CACHE_MARKER=false
 LPL_CACHE_STORE=
 LPL_INVALID_SIGNATURE_MESSAGE="Expired or Invalid Link"
 ```
-`LPL_USER_MODEL` is the the authenticatable model you are logging in (usually App\Models\User)
-
 `LPL_REMEMBER_LOGIN` is whether you want to remember the login (like the user checking Remember Me)
 
 `LPL_LOGIN_ROUTE` is the route that points to the login function this package provides. Make sure you don't collide with one of your other routes.
