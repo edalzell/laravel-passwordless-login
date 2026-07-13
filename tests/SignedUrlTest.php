@@ -13,6 +13,7 @@ use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
+use Grosv\LaravelPasswordlessLogin\UserClass;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
@@ -184,6 +185,8 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function a_link_invalidated_via_facade_cannot_be_used()
     {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
         PasswordlessLogin::invalidateForUser($this->user);
         $this->assertGuest();
 
@@ -198,6 +201,8 @@ class SignedUrlTest extends TestCase
     #[Test]
     public function generating_a_new_link_clears_invalidation()
     {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
         PasswordlessLogin::invalidateForUser($this->user);
         $this->url = (new LoginUrl($this->user))->generate();
 
@@ -242,5 +247,80 @@ class SignedUrlTest extends TestCase
         $this->followingRedirects()->get($this->url);
         $this->assertAuthenticatedAs($this->user);
         Auth::logout();
+    }
+
+    #[Test]
+    public function generating_a_second_link_does_not_invalidate_the_first()
+    {
+        // $this->url (from setUp) is the long-lived link; generate a short-lived second link.
+        $this->user->login_route_expires_in = 5;
+        (new LoginUrl($this->user))->generate();
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function consuming_a_use_once_link_does_not_invalidate_a_sibling_link()
+    {
+        Config::set('laravel-passwordless-login.login_use_once', true);
+
+        $this->user->login_route_expires_in = 60;
+        $second = (new LoginUrl($this->user))->generate();
+
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+        Auth::logout();
+
+        $this->followingRedirects()->get($second);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function a_link_with_no_cache_marker_still_works_by_default()
+    {
+        // Simulates a link generated before this package tracked markers in the cache
+        // (see issue #140) — its signature and expiry are valid, but no marker exists.
+        cache()->forget(UserClass::cacheKey($this->user));
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function a_link_with_no_cache_marker_is_rejected_when_marker_is_required()
+    {
+        Config::set('laravel-passwordless-login.require_cache_marker', true);
+
+        cache()->forget(UserClass::cacheKey($this->user));
+
+        $this->assertGuest();
+        $this->get($this->url);
+        $this->assertGuest();
+
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidSignatureException::class);
+        $this->get($this->url);
+    }
+
+    #[Test]
+    public function markers_are_written_to_the_configured_cache_store_not_the_default()
+    {
+        Config::set('cache.stores.default_test_store', ['driver' => 'array']);
+        Config::set('cache.default', 'default_test_store');
+        Config::set('cache.stores.markers', ['driver' => 'array']);
+        Config::set('laravel-passwordless-login.cache_store', 'markers');
+
+        $key = UserClass::cacheKey($this->user);
+        $this->url = (new LoginUrl($this->user))->generate();
+
+        $this->assertTrue(cache()->store('markers')->has($key));
+        $this->assertFalse(cache()->store('default_test_store')->has($key));
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
     }
 }
