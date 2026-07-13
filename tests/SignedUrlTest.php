@@ -243,4 +243,32 @@ class SignedUrlTest extends TestCase
         $this->assertAuthenticatedAs($this->user);
         Auth::logout();
     }
+
+    #[Test]
+    public function generating_a_second_link_does_not_invalidate_the_first()
+    {
+        // $this->url (from setUp) is the long-lived link; generate a short-lived second link.
+        $this->user->login_route_expires_in = 5;
+        (new LoginUrl($this->user))->generate();
+
+        $this->assertGuest();
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+    }
+
+    #[Test]
+    public function consuming_a_use_once_link_does_not_invalidate_a_sibling_link()
+    {
+        Config::set('laravel-passwordless-login.login_use_once', true);
+
+        $this->user->login_route_expires_in = 60;
+        $second = (new LoginUrl($this->user))->generate();
+
+        $this->followingRedirects()->get($this->url);
+        $this->assertAuthenticatedAs($this->user);
+        Auth::logout();
+
+        $this->followingRedirects()->get($second);
+        $this->assertAuthenticatedAs($this->user);
+    }
 }

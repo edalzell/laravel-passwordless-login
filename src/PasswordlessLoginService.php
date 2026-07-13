@@ -2,6 +2,7 @@
 
 namespace Grosv\LaravelPasswordlessLogin;
 
+use Carbon\Carbon;
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -12,14 +13,26 @@ use Illuminate\Support\Facades\Auth;
  */
 class PasswordlessLoginService
 {
-    private string $cacheKey;
-
     public ?Authenticatable $user;
 
     public function __construct()
     {
         $this->user = $this->getUser();
-        $this->cacheKey = request('user_type').request('uid');
+    }
+
+    private function cacheKey(): string
+    {
+        return request('user_type').request('uid');
+    }
+
+    private function expires(): int
+    {
+        return (int) request('expires');
+    }
+
+    private function activeLinks(): array
+    {
+        return UserClass::activeLinks($this->cacheKey());
     }
 
     /**
@@ -27,7 +40,7 @@ class PasswordlessLoginService
      */
     public function usesTrait(): bool
     {
-        $traits = class_uses($this->user, true);
+        $traits = class_uses_recursive($this->user);
 
         return in_array(PasswordlessLogin::class, $traits);
     }
@@ -57,13 +70,28 @@ class PasswordlessLoginService
             ? $this->user->login_use_once
             : config('laravel-passwordless-login.login_use_once');
 
-        if ($loginOnce) {
-            cache()->forget($this->cacheKey);
+        if (! $loginOnce) {
+            return;
         }
+
+        $activeLinks = $this->activeLinks();
+        unset($activeLinks[$this->expires()]);
+
+        if (empty($activeLinks)) {
+            cache()->forget($this->cacheKey());
+
+            return;
+        }
+
+        cache()->put(
+            $this->cacheKey(),
+            $activeLinks,
+            Carbon::createFromTimestamp(max(array_keys($activeLinks)))
+        );
     }
 
     public function requestIsNew(): bool
     {
-        return cache()->has($this->cacheKey);
+        return array_key_exists($this->expires(), $this->activeLinks());
     }
 }

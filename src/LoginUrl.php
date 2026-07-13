@@ -38,7 +38,27 @@ class LoginUrl
             ]
         );
 
-        cache()->put(UserClass::cacheKey($this->user), true, $this->routeExpires);
+        // Keyed by expiry rather than a single boolean so a second link for the same
+        // user can't clobber an earlier, still-valid link's marker (see issue #140).
+        $key = UserClass::cacheKey($this->user);
+        $activeLinks = UserClass::activeLinks($key);
+
+        // Drop already-expired entries so this array doesn't grow unbounded for users
+        // who generate many links.
+        $activeLinks = array_filter(
+            $activeLinks,
+            fn (bool $active, int $expires): bool => $expires >= now()->timestamp, ARRAY_FILTER_USE_BOTH
+        );
+
+        $activeLinks[$this->routeExpires->timestamp] = true;
+
+        // TTL must cover the furthest-out link, not just this one, or a later
+        // short-lived link would prematurely evict an existing long-lived one.
+        cache()->put(
+            $key,
+            $activeLinks,
+            Carbon::createFromTimestamp(max(array_keys($activeLinks)))
+        );
 
         return $url;
     }

@@ -12,6 +12,14 @@ class UserClass
         return static::toSlug(get_class($user)).$user->getAuthIdentifier();
     }
 
+    // Pre-upgrade entries were a bare `true`; treat those as empty rather than erroring.
+    public static function activeLinks(string $key): array
+    {
+        $activeLinks = cache()->get($key, []);
+
+        return is_array($activeLinks) ? $activeLinks : [];
+    }
+
     public static function toSlug(string $class): string
     {
         $pieces = array_map(function (string $piece): string {
