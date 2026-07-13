@@ -10,7 +10,6 @@ use Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
-use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
 use Grosv\LaravelPasswordlessLogin\UserClass;
@@ -20,6 +19,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Orchestra\Testbench\Attributes\WithConfig;
 use PHPUnit\Framework\Attributes\Test;
+use Tests\Fixtures\Models\User as TestUser;
 
 class SignedUrlTest extends TestCase
 {
@@ -46,7 +46,7 @@ class SignedUrlTest extends TestCase
             'remember_token' => Str::random(10),
         ]);
 
-        $this->model_user = ModelUser::create([
+        $this->model_user = TestUser::create([
             'name' => $faker->name,
             'email' => $faker->unique()->safeEmail,
             'email_verified_at' => now(),

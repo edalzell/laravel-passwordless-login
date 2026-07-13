@@ -5,7 +5,6 @@ namespace Grosv\LaravelPasswordlessLogin;
 use Carbon\Carbon;
 use Grosv\LaravelPasswordlessLogin\Traits\PasswordlessLogin;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 /**
@@ -64,11 +63,6 @@ class PasswordlessLoginService
         return Auth::guard($guard)
             ->getProvider()
             ->retrieveById(request('uid'));
-    }
-
-    public function cacheRequest(Request $request): void
-    {
-        $this->consumeRequest();
     }
 
     public function consumeRequest(): void
