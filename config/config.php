@@ -3,7 +3,6 @@
 use Grosv\LaravelPasswordlessLogin\HandleAuthenticatedUsers;
 
 return [
-    'user_model' => env('LPL_USER_MODEL', 'App\Models\User'),
     'user_guard' => env('LPL_USER_GUARD', 'web'),
     'remember_login' => env('LPL_REMEMBER_LOGIN', false),
     'login_route' => env('LPL_LOGIN_ROUTE', '/magic-login'),
@@ -12,6 +11,8 @@ return [
     'login_route_expires' => intval(env('LPL_LOGIN_ROUTE_EXPIRES', 30)),
     'redirect_on_success' => env('LPL_REDIRECT_ON_LOGIN', '/'),
     'login_use_once' => env('LPL_USE_ONCE', false),
+    'require_cache_marker' => env('LPL_REQUIRE_CACHE_MARKER', false),
+    'cache_store' => env('LPL_CACHE_STORE'),
     'invalid_signature_message' => env('LPL_INVALID_SIGNATURE_MESSAGE', ''),
     'middleware' => env('LPL_MIDDLEWARE', ['web', HandleAuthenticatedUsers::class]),
 ];

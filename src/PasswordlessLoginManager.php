@@ -43,6 +43,6 @@ class PasswordlessLoginManager
 
     public function invalidateForUser(User $user): void
     {
-        cache()->forget(UserClass::cacheKey($user));
+        UserClass::store()->forget(UserClass::cacheKey($user));
     }
 }
