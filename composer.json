@@ -20,7 +20,8 @@
         "illuminate/support": "^11.0|^12.0|^13.0"
     },
     "require-dev": {
-        "orchestra/testbench": "^9.0|^10.0|^11.0"
+        "orchestra/testbench": "^10.0|^11.1",
+        "pestphp/pest": "^4.7.5"
     },
     "autoload": {
         "psr-4": {
@@ -30,12 +31,18 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/",
+            "Tests\\Fixtures\\": "tests/__fixtures__",
             "App\\": "vendor/orchestra/testbench-core/laravel/app"
         }
     },
     "extra": {
         "laravel": {
             "providers": "Grosv\\LaravelPasswordlessLogin\\LaravelPasswordlessLoginProvider"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
         }
     }
 }
