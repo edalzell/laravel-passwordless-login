@@ -8,13 +8,13 @@ use Grosv\LaravelPasswordlessLogin\Events\LoginLinkSuccessful;
 use Grosv\LaravelPasswordlessLogin\Exceptions\ExpiredSignatureException;
 use Grosv\LaravelPasswordlessLogin\Exceptions\InvalidSignatureException;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
-use Grosv\LaravelPasswordlessLogin\Models\Models\User as ModelUser;
 use Grosv\LaravelPasswordlessLogin\Models\User;
 use Grosv\LaravelPasswordlessLogin\PasswordlessLogin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Tests\Fixtures\Models\User as ModelUser;
 use Tests\TestCase;
 
 uses(TestCase::class);
@@ -149,6 +149,7 @@ test('an authenticated user with redirect on url is redirected correctly', funct
 });
 
 test('a link invalidated via facade cannot be used', function () {
+    Config::set('laravel-passwordless-login.require_cache_marker', true);
     PasswordlessLogin::invalidateForUser($this->user);
     $this->assertGuest();
 
