@@ -46,7 +46,7 @@ class PasswordlessLoginService
      */
     public function usesTrait(): bool
     {
-        if (! $this->user) {
+        if (is_null($this->user)) {
             return false;
         }
 
