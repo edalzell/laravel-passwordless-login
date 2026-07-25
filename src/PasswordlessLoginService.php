@@ -46,6 +46,10 @@ class PasswordlessLoginService
      */
     public function usesTrait(): bool
     {
+        if (! $this->user) {
+            return false;
+        }
+
         $traits = class_uses_recursive($this->user);
 
         return in_array(PasswordlessLogin::class, $traits);

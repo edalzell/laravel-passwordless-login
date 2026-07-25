@@ -12,6 +12,6 @@ class LoginLinkExpired
     use Dispatchable, InteractsWithSockets,  SerializesModels;
 
     public function __construct(
-        public Authenticatable $user,
+        public ?Authenticatable $user,
     ) {}
 }
