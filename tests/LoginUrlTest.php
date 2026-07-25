@@ -136,6 +136,39 @@ test('an expired request will not log user in', function () {
     $this->get($this->url);
 });
 
+test('an expired request for a deleted user will not log user in', function () {
+    Event::fake();
+    $this->user->delete();
+    Carbon::setTestNow(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires') + 1));
+
+    // Make sure 401 is returned instead of a TypeError
+    $response = $this->get($this->url);
+    $response->assertStatus(401);
+    Event::assertNotDispatched(LoginLinkSuccessful::class);
+    Event::assertDispatched(LoginLinkExpired::class);
+
+    // Make sure ExpiredSignatureException is thrown, not a TypeError
+    $this->withoutExceptionHandling();
+    $this->expectException(ExpiredSignatureException::class);
+    $this->get($this->url);
+});
+
+test('a non-expired request for a deleted user will not log user in', function () {
+    Event::fake();
+    $this->user->delete();
+
+    // Make sure 401 is returned instead of a TypeError from the auth guard
+    $response = $this->get($this->url);
+    $response->assertStatus(401);
+    Event::assertNotDispatched(LoginLinkSuccessful::class);
+    Event::assertDispatched(LoginLinkInvalid::class);
+
+    // Make sure InvalidSignatureException is thrown, not a TypeError
+    $this->withoutExceptionHandling();
+    $this->expectException(InvalidSignatureException::class);
+    $this->get($this->url);
+});
+
 test('an authenticated user is redirected correctly', function () {
     $this->actingAs($this->user);
     $response = $this->get($this->url);

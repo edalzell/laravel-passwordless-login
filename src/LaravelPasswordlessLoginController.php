@@ -41,6 +41,10 @@ class LaravelPasswordlessLoginController extends Controller
             LoginLinkExpired::dispatch($this->passwordlessLoginService->user);
 
             throw new ExpiredSignatureException;
+        } elseif (! $this->passwordlessLoginService->user) {
+            LoginLinkInvalid::dispatch($this->passwordlessLoginService->user);
+
+            throw new InvalidSignatureException;
         }
 
         $this->passwordlessLoginService->consumeRequest();
