@@ -33,7 +33,7 @@ class LaravelPasswordlessLoginController extends Controller
     public function login(Request $request)
     {
         if (is_null($this->passwordlessLoginService->user)) {
-            LoginLinkInvalid::dispatch($this->passwordlessLoginService->user);
+            LoginLinkInvalid::dispatch();
 
             throw new InvalidSignatureException;
         }
