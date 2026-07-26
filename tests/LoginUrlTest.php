@@ -141,15 +141,15 @@ test('an expired request for a deleted user will not log user in', function () {
     $this->user->delete();
     Carbon::setTestNow(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires') + 1));
 
-    // Make sure 401 is returned instead of a TypeError
+    // A user that can't be resolved is invalid, regardless of expiry
     $response = $this->get($this->url);
     $response->assertStatus(401);
     Event::assertNotDispatched(LoginLinkSuccessful::class);
-    Event::assertDispatched(LoginLinkExpired::class);
+    Event::assertDispatched(LoginLinkInvalid::class);
 
-    // Make sure ExpiredSignatureException is thrown, not a TypeError
+    // Make sure InvalidSignatureException is thrown, not a TypeError
     $this->withoutExceptionHandling();
-    $this->expectException(ExpiredSignatureException::class);
+    $this->expectException(InvalidSignatureException::class);
     $this->get($this->url);
 });
 
