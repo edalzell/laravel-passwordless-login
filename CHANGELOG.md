@@ -2,6 +2,17 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.2.1 - 2026-07-26
+
+### 🐛 Fixed
+
+- Ensure soft-deleted users are not triggering TypeErrors [@spekulatius](https://github.com/spekulatius) (#146)
+
+### 🧰 Maintenance
+
+- Small tidy from PR [@edalzell](https://github.com/edalzell) (#147)
+- Use Pest [@edalzell](https://github.com/edalzell) (#138)
+
 ## v2.2.0 - 2026-07-13
 
 ### 🚀 New
