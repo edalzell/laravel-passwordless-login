@@ -25,7 +25,7 @@ jobs:
     needs: get_draft_release
     steps:
       - name: Checkout code
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
       - name: Update Changelog
         id: update_changelog
         uses: stefanzweifel/changelog-updater-action@v1.12.0
