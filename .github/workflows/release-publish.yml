@@ -1,0 +1,11 @@
+name: Release Publish
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  publish:
+    uses: edalzell/github-workflows/.github/workflows/release-publish.yml@0ccc48350b3c3e6a02c626526468e905dd0b59d0 # v1.1.2
+    permissions:
+      contents: write
