@@ -14,7 +14,7 @@ class HandleAuthenticatedUsers
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
 
-                return redirect($request->get('redirect_to', self::getHomeRoute()));
+                return redirect($request->input('redirect_to', self::getHomeRoute()));
             }
         }
 
