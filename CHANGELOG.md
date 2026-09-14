@@ -2,6 +2,16 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.2.2 - 2026-09-14
+
+### 🐛 Fixed
+
+- Request::get() has been deprecated, use input() [@erikverbeek](https://github.com/erikverbeek) (#150)
+
+### 🧰 Maintenance
+
+- Convert release flow to PR-gated reusable workflows [@edalzell](https://github.com/edalzell) (#151)
+
 ## v2.2.1 - 2026-07-26
 
 ### 🐛 Fixed
