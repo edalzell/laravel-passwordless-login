@@ -3,20 +3,10 @@ name: Release Drafter
 on:
   pull_request:
     types: [closed]
-permissions:
-  contents: write
 
 jobs:
-  update_release_draft:
-    if: github.event.pull_request.merged == true
+  draft:
+    uses: edalzell/github-workflows/.github/workflows/release-draft.yml@0ccc48350b3c3e6a02c626526468e905dd0b59d0 # v1.1.2
     permissions:
-      # write permission is required to create a github release
       contents: write
-      # write permission is required for autolabeler
-      # otherwise, read permission is required at least
       pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: release-drafter/release-drafter@v7.5.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
