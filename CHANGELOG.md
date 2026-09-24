@@ -2,6 +2,18 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.2.3 - 2026-09-24
+
+### 🐛 Fixed
+
+- Treat unresolvable user_type as an invalid link [@ValCanBuild](https://github.com/ValCanBuild) (#154)
+
+### 🧰 Maintenance
+
+- Run release drafter on pull_request_target [@edalzell](https://github.com/edalzell) (#155)
+- Freeze time before generating test login URL [@edalzell](https://github.com/edalzell) (#156)
+- Pin pr-labeler action and scope its permissions [@edalzell](https://github.com/edalzell) (#152)
+
 ## v2.2.2 - 2026-09-14
 
 ### 🐛 Fixed
