@@ -37,7 +37,7 @@ beforeEach(function () {
         'remember_token' => Str::random(10),
     ]);
 
-    Carbon::setTestNow();
+    $this->freezeTime();
 
     $generator = new LoginUrl($this->user);
     $this->url = $generator->generate();
@@ -50,7 +50,6 @@ beforeEach(function () {
 });
 
 test('can create default signed login url', function () {
-    Carbon::setTestNow(now());
     expect($this->expires)->toEqual(Carbon::now()->addMinutes(config('laravel-passwordless-login.login_route_expires'))->timestamp);
     expect($this->uid)->toEqual($this->user->id);
     expect($this->route)->toEqual(config('laravel-passwordless-login.login_route_name'));
