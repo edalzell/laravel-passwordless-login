@@ -99,6 +99,16 @@ test('an invalid signature request will not log user in', function () {
     $this->get($this->url.'tampered');
 });
 
+test('a request with an unresolvable user type is an invalid signature', function (string $userType) {
+    $this->withoutExceptionHandling();
+    $this->expectException(InvalidSignatureException::class);
+
+    $this->get(preg_replace('/user_type=[^&]+/', 'user_type='.urlencode($userType), $this->url));
+})->with([
+    'truncated link' => 'a…',
+    'non-authenticatable class' => 'illuminate-support-collection',
+]);
+
 test('allows override of post login redirect', function () {
     $generator = new LoginUrl($this->user);
     $generator->setRedirectUrl('/laravel_passwordless_login_redirect_overridden_route');
