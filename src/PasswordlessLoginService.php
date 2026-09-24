@@ -62,6 +62,11 @@ class PasswordlessLoginService
         }
 
         $userClass = UserClass::fromSlug(request('user_type'));
+
+        if (! is_a($userClass, Authenticatable::class, true)) {
+            return null;
+        }
+
         $guard = (new $userClass)->guard_name ?? config('laravel-passwordless-login.user_guard');
 
         return Auth::guard($guard)
