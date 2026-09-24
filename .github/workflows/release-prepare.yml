@@ -5,7 +5,7 @@ on:
 
 jobs:
   prepare:
-    uses: edalzell/github-workflows/.github/workflows/release-prepare.yml@0ccc48350b3c3e6a02c626526468e905dd0b59d0 # v1.1.2
+    uses: edalzell/github-workflows/.github/workflows/release-prepare.yml@d3f1ca37a5377c14d34fc54320cc8d8141badfe5 # v1.5.0
     permissions:
       contents: write
     secrets:
