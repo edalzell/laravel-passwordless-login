@@ -2,6 +2,24 @@
 
 All notable changes to Laravel Passwordless Login will be documented in this file.
 
+## v2.2.4 - 2026-11-03
+
+### 🔒 Security
+
+- High: a request body could override the signed login identity, allowing account takeover ([GHSA-3c8g-w468-p4pm](https://github.com/edalzell/laravel-passwordless-login/security/advisories/GHSA-3c8g-w468-p4pm))
+- Moderate: open redirect via unsigned `redirect_to` ([GHSA-4wf6-gqv9-mw65](https://github.com/edalzell/laravel-passwordless-login/security/advisories/GHSA-4wf6-gqv9-mw65))
+
+Thanks to [@ValCanBuild](https://github.com/ValCanBuild) for reporting these. All users should upgrade.
+
+### 🐛 Fixed
+
+- Only trust signed login values [`c1e3b8f`](https://github.com/edalzell/laravel-passwordless-login/commit/c1e3b8f5c4bdfca8a13fe39e2c04a3ddf21af550)
+
+### 🧰 Maintenance
+
+- Only trust signed login values in [`c1e3b8f`](https://github.com/edalzell/laravel-passwordless-login/commit/c1e3b8f5c4bdfca8a13fe39e2c04a3ddf21af550)
+- Use shared release-drafter config [@edalzell](https://github.com/edalzell) (#157)
+
 ## v2.2.3 - 2026-09-24
 
 ### 🐛 Fixed
