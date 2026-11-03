@@ -8,6 +8,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         laravel: [13.*, 12.*, 11.*]
         php: [8.5, 8.4, 8.3]
@@ -39,6 +40,10 @@ jobs:
         run: |
           echo "::add-matcher::${{ runner.tool_cache }}/php.json"
           echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+
+      - name: Allow Laravel 11 despite security advisories
+        if: matrix.laravel == '11.*'
+        run: composer config policy.advisories.block false
 
       - name: Install dependencies
         run: |
