@@ -3,7 +3,9 @@
 use Faker\Factory as Faker;
 use Grosv\LaravelPasswordlessLogin\LoginUrl;
 use Grosv\LaravelPasswordlessLogin\Models\User;
+use Grosv\LaravelPasswordlessLogin\UserClass;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -71,4 +73,42 @@ test('a user without a custom guard still uses the default guard', function () {
 
     $this->assertAuthenticatedAs($this->user, 'web');
     $this->assertGuest('admin');
+});
+
+test('a json body cannot override the signed uid', function () {
+    $url = (new LoginUrl($this->user))->generate();
+    $other = User::create([
+        'name' => 'Other',
+        'email' => 'other@example.com',
+        'password' => 'secret',
+    ]);
+
+    $this->json('GET', $url, ['uid' => $other->id]);
+
+    $this->assertAuthenticatedAs($this->user, 'web');
+});
+
+test('a json body cannot override the signed user type', function () {
+    $url = (new LoginUrl($this->user))->generate();
+
+    $this->json('GET', $url, ['user_type' => UserClass::toSlug(AdminUser::class)]);
+
+    $this->assertAuthenticatedAs($this->user, 'web');
+    $this->assertGuest('admin');
+});
+
+test('a json body cannot override the signed expires', function () {
+    Config::set('laravel-passwordless-login.login_use_once', true);
+
+    $url = (new LoginUrl($this->user))->generate();
+    $this->travel(1)->minutes();
+    $otherExpires = Str::of((new LoginUrl($this->user))->generate())->match('/expires=(\d+)/')->toString();
+
+    $this->get($url);
+    $this->assertAuthenticatedAs($this->user, 'web');
+    Auth::logout();
+
+    $this->json('GET', $url, ['expires' => $otherExpires]);
+
+    $this->assertGuest('web');
 });

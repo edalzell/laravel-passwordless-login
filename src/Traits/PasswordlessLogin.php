@@ -46,7 +46,7 @@ trait PasswordlessLogin
      */
     public function onPasswordlessLoginSuccess(Request $request): RedirectResponse|Redirector
     {
-        return ($request->has('redirect_to')) ? redirect($request->redirect_to) : redirect($this->redirect_url);
+        return redirect($request->query('redirect_to') ?: $this->redirect_url);
     }
 
     public function generateLoginUrl(): string

@@ -21,12 +21,12 @@ class PasswordlessLoginService
 
     private function cacheKey(): string
     {
-        return request('user_type').request('uid');
+        return request()->query('user_type').request()->route('uid');
     }
 
     private function expires(): int
     {
-        return (int) request('expires');
+        return (int) request()->query('expires');
     }
 
     private function activeLinks(): array
@@ -57,11 +57,11 @@ class PasswordlessLoginService
 
     public function getUser(): ?Authenticatable
     {
-        if (! request()->has('user_type')) {
+        if (! request()->query->has('user_type')) {
             return null;
         }
 
-        $userClass = UserClass::fromSlug(request('user_type'));
+        $userClass = UserClass::fromSlug(request()->query('user_type'));
 
         if (! is_a($userClass, Authenticatable::class, true)) {
             return null;
@@ -71,7 +71,7 @@ class PasswordlessLoginService
 
         return Auth::guard($guard)
             ->getProvider()
-            ->retrieveById(request('uid'));
+            ->retrieveById(request()->route('uid'));
     }
 
     public function consumeRequest(): void

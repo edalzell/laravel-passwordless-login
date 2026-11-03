@@ -4,6 +4,7 @@ namespace Grosv\LaravelPasswordlessLogin;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class HandleAuthenticatedUsers
 {
@@ -13,8 +14,9 @@ class HandleAuthenticatedUsers
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                $redirectTo = URL::hasValidSignature($request) ? $request->query('redirect_to') : null;
 
-                return redirect($request->input('redirect_to', self::getHomeRoute()));
+                return redirect($redirectTo ?: self::getHomeRoute());
             }
         }
 

@@ -184,10 +184,19 @@ test('an authenticated user is redirected correctly', function () {
     $response->assertRedirect(config('laravel-passwordless-login.redirect_on_success'));
 });
 
-test('an authenticated user with redirect on url is redirected correctly', function () {
+test('an authenticated user with a signed redirect is redirected to it', function () {
+    $generator = new LoginUrl($this->user);
+    $generator->setRedirectUrl('/happy_path');
+
     $this->actingAs($this->user);
-    $response = $this->get($this->url.'&redirect_to=/happy_path');
+    $response = $this->get($generator->generate());
     $response->assertRedirect('/happy_path');
+});
+
+test('an authenticated user ignores an unsigned redirect', function () {
+    $this->actingAs($this->user);
+    $response = $this->get($this->url.'&redirect_to=https://attacker.example');
+    $response->assertRedirect(config('laravel-passwordless-login.redirect_on_success'));
 });
 
 test('a link invalidated via facade cannot be used', function () {
@@ -234,4 +243,10 @@ test('a multi use link can be used multiple times', function () {
     $this->followingRedirects()->get($this->url);
     $this->assertAuthenticatedAs($this->user);
     Auth::logout();
+});
+
+test('a json body cannot override the signed redirect', function () {
+    $response = $this->json('GET', $this->url, ['redirect_to' => 'https://attacker.example']);
+
+    $response->assertRedirect(config('laravel-passwordless-login.redirect_on_success'));
 });
